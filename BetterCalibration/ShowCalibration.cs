@@ -98,11 +98,13 @@ namespace BetterCalibration {
             if(_gameObject == null) Initialize();
             SetupText();
             Object.DontDestroyOnLoad(_gameObject);
+            Cursor.visible = true;
         }
 
         public static void Hide() {
             if(_gameObject == null) return;
             Object.DestroyImmediate(_gameObject);
+            Cursor.visible = !Persistence.GetHideCursorWhilePlaying();
         }
     }
 }
