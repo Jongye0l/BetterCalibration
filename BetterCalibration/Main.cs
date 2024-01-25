@@ -111,7 +111,8 @@ namespace BetterCalibration {
         }
 
         public static Values GetValues() {
-            return RDString.language == SystemLanguage.Korean ? Values.Korean : Values.English;
+            return RDString.language == SystemLanguage.Korean ? Values.Korean : 
+                RDString.language == SystemLanguage.Japanese ? Values.Japanese : Values.English;
         }
     }
 }
