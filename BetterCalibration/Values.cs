@@ -1,6 +1,7 @@
 ﻿namespace BetterCalibration {
     public class Values {
         public static readonly Values Korean = new Values {
+            Key = 0,
             Pitch = "보정 피치",
             Minimum = "최소 보정값",
             Popup = "오프셋 조정 팝업 표시",
@@ -10,6 +11,7 @@
         };
 
         public static readonly Values English = new Values {
+            Key = 1,
             Pitch = "Calibration Pitch",
             Minimum = "Minimum Calibration Value",
             Popup = "Show Offset Adjust Popup",
@@ -19,6 +21,7 @@
         };
 
         public static readonly Values Japanese = new Values {
+            Key = 2,
             Pitch = "較正ピッチ",
             Minimum = "最小較正値",
             Popup = "オフセット調整ポップアップを表示",
@@ -27,6 +30,7 @@
             Default = "既定値"
         };
 
+        public int Key;
         public string Pitch;
         public string Minimum;
         public string Popup;
