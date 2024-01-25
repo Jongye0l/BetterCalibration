@@ -1,0 +1,7 @@
+# Intellij Idea
+.idea
+
+# Compile File
+*.dll
+bin/
+obj/
