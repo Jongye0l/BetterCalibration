@@ -14,6 +14,13 @@
             ChangeOffset = "Do you want to set your input offset from\n{0}ms to {1}ms?"
         };
 
+        public static Values Japanese = new Values {
+            Pitch = "較正ピッチ",
+            Minimum = "最小較正値",
+            Popup = "オフセット調整ポップアップを表示",
+            ChangeOffset = "入力オフセットを変更しますか？\n{0} -> {1}"
+        };
+
         public string Pitch;
         public string Minimum;
         public string Popup;
