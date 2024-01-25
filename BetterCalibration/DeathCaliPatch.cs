@@ -29,6 +29,7 @@ namespace BetterCalibration {
             float timing = angle / 180 / bpmTimesSpeed / conductorPitch * 60000;
             if(__result == HitMargin.TooEarly) _lastTiming = timing;
             else {
+                if(_lastTiming != null && __result == HitMargin.TooLate) ShowCalibration.Timings.Add((float) _lastTiming);
                 ShowCalibration.Timings.Add(timing);
                 _lastTiming = null;
             }
