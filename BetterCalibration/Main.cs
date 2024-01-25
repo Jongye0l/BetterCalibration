@@ -35,9 +35,32 @@ namespace BetterCalibration {
         
         private static void OnGUI(UnityModManager.ModEntry modEntry) {
             Values values = GetValues();
+            AddSettingLanguage(values.Language, values.Default);
             AddSettingPitch(ref Settings.Pitch, 100, ref Settings.PitchString, values.Pitch);
             AddSettingToggleInt(ref Settings.Minimum, 0, ref Settings.UseMinimum, ref Settings.MinimumString, values.Minimum);
             AddSettingToggle(ref Settings.ShowPopup, values.Popup);
+        }
+
+        private static void AddSettingLanguage(string text, string defaultText) {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(text);
+            GUILayout.Space(4f);
+            AddLanguageButton(GetSelectText(defaultText, Settings.Values == null), null);
+            AddLanguageButton(GetSelectText("한국어", Settings.Values == Values.Korean), Values.Korean);
+            AddLanguageButton(GetSelectText("English", Settings.Values == Values.English), Values.English);
+            AddLanguageButton(GetSelectText("日本語", Settings.Values == Values.Japanese), Values.Japanese);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+
+        private static void AddLanguageButton(string text, Values values) {
+            if(!GUILayout.Button(text)) return;
+            Settings.Values = values;
+            Settings.Save();
+        }
+
+        private static string GetSelectText(string text, bool selected) {
+            return string.Format(selected ? "<b>{0}</b>" : "{0}", text);
         }
         
         private static void AddSettingToggle(ref bool value, string text) {
@@ -111,8 +134,9 @@ namespace BetterCalibration {
         }
 
         public static Values GetValues() {
-            return RDString.language == SystemLanguage.Korean ? Values.Korean : 
-                RDString.language == SystemLanguage.Japanese ? Values.Japanese : Values.English;
+            return Settings.Values ?? 
+                   (RDString.language == SystemLanguage.Korean ? Values.Korean : 
+                       RDString.language == SystemLanguage.Japanese ? Values.Japanese : Values.English);
         }
     }
 }

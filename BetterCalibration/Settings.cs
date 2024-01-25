@@ -13,6 +13,7 @@ namespace BetterCalibration {
         public string MinimumString;
         public bool UseMinimum = false;
         public bool ShowPopup = true;
+        public Values Values;
         
         public static Settings CreateInstance() {
             Instance = File.Exists(SettingPath) ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(SettingPath)) : new Settings();
