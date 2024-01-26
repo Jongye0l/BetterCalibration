@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace BetterCalibration {
-    public class ShowCalibration {
+namespace BetterCalibration.GUI {
+    public class ShowCalibrationPopup {
         private static GameObject _gameObject;
         private static Text _popupText;
         public static List<float> Timings = new List<float>();

@@ -1,15 +1,13 @@
-﻿using System;
-using HarmonyLib;
-using UnityEngine;
+﻿using HarmonyLib;
 
-namespace BetterCalibration {
+namespace BetterCalibration.Patch {
     [HarmonyPatch]
     public class CalibrationPatch {
         private static readonly Settings Settings = Settings.Instance;
         private static float _bpm;
         private static float _lastTime;
         private static int _attempt;
-        
+
         [HarmonyPatch(typeof(scrCalibrationPlanet), "Start")]
         [HarmonyPostfix]
         public static void SetPitch(scrConductor ___conductor) {
@@ -37,13 +35,13 @@ namespace BetterCalibration {
         public static void BpmPostfix(scrConductor ___conductor) {
             ___conductor.bpm = 130;
         }
-        
+
         [HarmonyPatch(typeof(scrCalibrationPlanet), "PostSong")]
         [HarmonyPrefix]
         public static void ResetPitch(scrConductor ___conductor) {
             ___conductor.song.pitch = 1;
         }
-        
+
         [HarmonyPatch(typeof(scrCalibrationPlanet), "GetOffset")]
         [HarmonyPostfix]
         public static void SetOffset(ref double __result) {

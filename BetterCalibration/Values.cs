@@ -16,7 +16,7 @@
             Pitch = "Calibration Pitch",
             Minimum = "Minimum Calibration Value",
             Popup = "Show Offset Adjust Popup",
-            ChangeOffset = "Do you want to set your input offset from\n{0}ms to {1}ms?", 
+            ChangeOffset = "Do you want to set your input offset from\n{0}ms to {1}ms?",
             Language = "Language",
             Default = "Default",
             RepeatSong = "Calibration Song Repeat"

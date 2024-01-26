@@ -495,12 +495,13 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="CalibrationPatch.cs" />
-        <Compile Include="DeathCaliPatch.cs" />
+        <Compile Include="GUI\SettingGUI.cs" />
+        <Compile Include="GUI\ShowCalibrationPopup.cs" />
         <Compile Include="Main.cs" />
+        <Compile Include="Patch\CalibrationPatch.cs" />
+        <Compile Include="Patch\DeathCaliPatch.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="Settings.cs" />
-        <Compile Include="ShowCalibration.cs" />
         <Compile Include="Values.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>

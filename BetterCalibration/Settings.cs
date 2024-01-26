@@ -28,7 +28,7 @@ namespace BetterCalibration {
         [JsonProperty] private int ValuesCode = -1;
         public int RepeatSong = 0;
         [JsonIgnore] public string RepeatString;
-        
+
         public static Settings CreateInstance() {
             Instance = File.Exists(SettingPath) ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(SettingPath)) : new Settings();
             return Instance;

@@ -1,30 +1,31 @@
 ﻿using System;
+using BetterCalibration.GUI;
 using HarmonyLib;
 using MonsterLove.StateMachine;
 
-namespace BetterCalibration {
+namespace BetterCalibration.Patch {
     [HarmonyPatch]
     public class DeathCaliPatch {
 
         private static float? _lastTooEarly;
         private static float? _lastTooLate;
-        
-        [HarmonyPatch(typeof (StateBehaviour), "ChangeState", typeof(Enum))]
+
+        [HarmonyPatch(typeof(StateBehaviour), "ChangeState", typeof(Enum))]
         [HarmonyPostfix]
         public static void OnChangeState(Enum newState) {
-            if((States) newState == States.Fail2) ShowCalibration.Show();
+            if((States) newState == States.Fail2) ShowCalibrationPopup.Show();
             else {
-                ShowCalibration.Hide();
+                ShowCalibrationPopup.Hide();
                 _lastTooEarly = null;
                 _lastTooLate = null;
             }
-            if((States) newState == States.Start) ShowCalibration.Timings.Clear();
+            if((States) newState == States.Start) ShowCalibrationPopup.Timings.Clear();
         }
 
         [HarmonyPatch(typeof(scrController), "TogglePauseGame")]
         [HarmonyPostfix]
         public static void ExitPlay() {
-            ShowCalibration.Hide();
+            ShowCalibrationPopup.Hide();
             _lastTooEarly = null;
             _lastTooLate = null;
         }
@@ -37,7 +38,7 @@ namespace BetterCalibration {
             if(__result == HitMargin.TooEarly) _lastTooEarly = timing;
             else if(__result == HitMargin.TooLate) _lastTooLate = timing;
             else {
-                ShowCalibration.Timings.Add(timing);
+                ShowCalibrationPopup.Timings.Add(timing);
                 _lastTooEarly = null;
                 _lastTooLate = null;
             }
@@ -48,8 +49,8 @@ namespace BetterCalibration {
         public static void MissCheck(HitMargin hit) {
             if(hit != HitMargin.FailMiss) return;
             if(_lastTooEarly == null || _lastTooLate == null) return;
-            ShowCalibration.Timings.Add((float) _lastTooLate);
-            ShowCalibration.Timings.Add((float) _lastTooEarly);
+            ShowCalibrationPopup.Timings.Add((float) _lastTooLate);
+            ShowCalibrationPopup.Timings.Add((float) _lastTooEarly);
             _lastTooLate = null;
             _lastTooEarly = null;
         }
