@@ -10,9 +10,14 @@ namespace BetterCalibration {
         
         [HarmonyPatch(typeof(scrCalibrationPlanet), "Start")]
         [HarmonyPostfix]
+        public static void SetPitch() {
+            _bpm = (float) (1.3 * Settings.Pitch); // (BPM) 130 / (Default Pitch) 100 = 1.3
+        }
+
+        [HarmonyPatch(typeof(scrCalibrationPlanet), "CleanSlate")]
+        [HarmonyPrefix]
         public static void SetPitch(scrConductor ___conductor) {
             ___conductor.song.pitch = Settings.Pitch / 100;
-            _bpm = (float) (1.3 * Settings.Pitch); // (BPM) 130 / (Default Pitch) 100 = 1.3
         }
 
         [HarmonyPatch(typeof(scrCalibrationPlanet), "PutDataPoint")]
@@ -32,7 +37,7 @@ namespace BetterCalibration {
         public static void ResetPitch(scrConductor ___conductor) {
             ___conductor.song.pitch = 1;
         }
-
+        
         [HarmonyPatch(typeof(scrCalibrationPlanet), "GetOffset")]
         [HarmonyPostfix]
         public static void SetOffset(ref double __result) {
