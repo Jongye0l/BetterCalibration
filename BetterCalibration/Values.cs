@@ -34,9 +34,9 @@
             ChangeOffset = "入力オフセットを変更しますか？\n{0} -> {1}",
             Language = "言語",
             Default = "既定値",
-            RepeatSong = "Calibration Song Repeat",
-            CalibrationDetail = "Avg: {0}ms\nMax: {1}ms\nMin: {2}ms",
-            UseDetail = "Show Calibration Detail"
+            RepeatSong = "較正曲の繰り返し数",
+            CalibrationDetail = "平均：{0}ms\n最大：{1}ms\n最小：{2}ms",
+            UseDetail = "較正の詳細結果を表示"
         };
 
         public int Key;
