@@ -14,6 +14,7 @@ namespace BetterCalibration.Patch {
             ___conductor.song.pitch = Settings.Pitch / 100;
             _bpm = (float) (1.3 * Settings.Pitch); // (BPM) 130 / (Default Pitch) 100 = 1.3
             ___conductor.song.loop = Settings.RepeatSong > 0;
+            _attempt = 0;
         }
 
         [HarmonyPatch(typeof(scrCalibrationPlanet), "CleanSlate")]
