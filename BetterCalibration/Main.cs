@@ -38,6 +38,7 @@ namespace BetterCalibration {
             AddSettingLanguage(values.Language, values.Default);
             AddSettingPitch(ref Settings.Pitch, 100, ref Settings.PitchString, values.Pitch);
             AddSettingToggleInt(ref Settings.Minimum, 0, ref Settings.UseMinimum, ref Settings.MinimumString, values.Minimum);
+            AddSettingInt(ref Settings.RepeatSong, 0, ref Settings.RepeatString, values.RepeatSong);
             AddSettingToggle(ref Settings.ShowPopup, values.Popup);
         }
 
@@ -99,6 +100,31 @@ namespace BetterCalibration {
                 GUILayout.Label("ms");
             } else if(value2) {
                 value2 = false;
+                Settings.Save();
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+
+        private static void AddSettingInt(ref int value, int defaultValue, ref string valueString, string text) {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(text);
+            GUILayout.Space(4f);
+            if(valueString == null) valueString = value.ToString();
+            valueString = GUILayout.TextField(valueString, GUILayout.Width(50));
+            int resultInt;
+            try {
+                resultInt = valueString.IsNullOrEmpty() ? defaultValue : int.Parse(valueString);
+                if(resultInt < 0) {
+                    resultInt = 0;
+                    valueString = "0";
+                }
+            } catch (FormatException) {
+                resultInt = defaultValue;
+                valueString = defaultValue.ToString();
+            }
+            if(resultInt != value) {
+                value = resultInt;
                 Settings.Save();
             }
             GUILayout.FlexibleSpace();

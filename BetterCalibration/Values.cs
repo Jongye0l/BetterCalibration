@@ -7,7 +7,8 @@
             Popup = "오프셋 조정 팝업 표시",
             ChangeOffset = "입력 오프셋을 다음과 같이 바꾸겠습니까?\n{0} -> {1}",
             Language = "언어",
-            Default = "기본값"
+            Default = "기본값",
+            RepeatSong = "보정 노래 반복횟수"
         };
 
         public static readonly Values English = new Values {
@@ -17,7 +18,8 @@
             Popup = "Show Offset Adjust Popup",
             ChangeOffset = "Do you want to set your input offset from\n{0}ms to {1}ms?", 
             Language = "Language",
-            Default = "Default"
+            Default = "Default",
+            RepeatSong = "Calibration Song Repeat"
         };
 
         public static readonly Values Japanese = new Values {
@@ -27,7 +29,8 @@
             Popup = "オフセット調整ポップアップを表示",
             ChangeOffset = "入力オフセットを変更しますか？\n{0} -> {1}",
             Language = "言語",
-            Default = "既定値"
+            Default = "既定値",
+            RepeatSong = "Calibration Song Repeat"
         };
 
         public int Key;
@@ -37,5 +40,6 @@
         public string ChangeOffset;
         public string Language;
         public string Default;
+        public string RepeatSong;
     }
 }

@@ -6,20 +6,12 @@ namespace BetterCalibration {
         private static readonly string SettingPath = Path.Combine(Main.ModEntry.Path, "Settings.json");
         public static Settings Instance;
         public float Pitch = 100;
-
-        [JsonIgnore]
-        public string PitchString;
-
+        [JsonIgnore] public string PitchString;
         public int Minimum = 0;
-
-        [JsonIgnore]
-        public string MinimumString;
-
+        [JsonIgnore] public string MinimumString;
         public bool UseMinimum = false;
         public bool ShowPopup = true;
-
-        [JsonIgnore]
-        public Values Values {
+        [JsonIgnore] public Values Values {
             get {
                 switch (ValuesCode) {
                     case 0: return Values.Korean;
@@ -33,10 +25,10 @@ namespace BetterCalibration {
                 else ValuesCode = value.Key;
             }
         }
-
-        [JsonProperty]
-        private int ValuesCode = -1;
-
+        [JsonProperty] private int ValuesCode = -1;
+        public int RepeatSong = 0;
+        [JsonIgnore] public string RepeatString;
+        
         public static Settings CreateInstance() {
             Instance = File.Exists(SettingPath) ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(SettingPath)) : new Settings();
             return Instance;
