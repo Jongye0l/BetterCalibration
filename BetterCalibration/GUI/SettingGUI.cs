@@ -13,6 +13,7 @@ namespace BetterCalibration.GUI {
             AddSettingPitch(ref Settings.Pitch, 100, ref Settings.PitchString, values.Pitch);
             AddSettingToggleInt(ref Settings.Minimum, 0, ref Settings.UseMinimum, ref Settings.MinimumString, values.Minimum);
             AddSettingInt(ref Settings.RepeatSong, 0, ref Settings.RepeatString, values.RepeatSong);
+            AddSettingToggle(ref Settings.Detail, values.UseDetail);
             AddSettingToggle(ref Settings.ShowPopup, values.Popup);
         }
 

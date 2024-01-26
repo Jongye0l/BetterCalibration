@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using BetterCalibration.GUI;
+using HarmonyLib;
 
 namespace BetterCalibration.Patch {
     [HarmonyPatch]
@@ -10,11 +11,12 @@ namespace BetterCalibration.Patch {
 
         [HarmonyPatch(typeof(scrCalibrationPlanet), "Start")]
         [HarmonyPostfix]
-        public static void SetPitch(scrConductor ___conductor) {
+        public static void SetPitch(scrCalibrationPlanet __instance, scrConductor ___conductor) {
             ___conductor.song.pitch = Settings.Pitch / 100;
             _bpm = (float) (1.3 * Settings.Pitch); // (BPM) 130 / (Default Pitch) 100 = 1.3
             ___conductor.song.loop = Settings.RepeatSong > 0;
             _attempt = 0;
+            CalibrationDetail.Initialize(__instance);
         }
 
         [HarmonyPatch(typeof(scrCalibrationPlanet), "CleanSlate")]
@@ -51,6 +53,7 @@ namespace BetterCalibration.Patch {
             double result = __result * 1000;
             while(result < Settings.Minimum) result += time360;
             __result = result / 1000;
+            CalibrationDetail.CheckTiming(result);
         }
 
         [HarmonyPatch(typeof(scrCalibrationPlanet), "Update")]
@@ -58,6 +61,18 @@ namespace BetterCalibration.Patch {
         public static void CheckRepeat(scrConductor ___conductor) {
             if(_lastTime > ___conductor.song.time && ++_attempt >= Settings.RepeatSong) ___conductor.song.loop = false;
             _lastTime = ___conductor.song.time;
+        }
+
+        [HarmonyPatch(typeof(scrCalibrationPlanet), "PutDataPoint")]
+        [HarmonyPostfix]
+        public static void ReloadText() {
+            CalibrationDetail.LoadText();
+        }
+
+        [HarmonyPatch(typeof(scrCalibrationPlanet), "SetMessageNumber")]
+        [HarmonyPostfix]
+        public static void Setup(int n) {
+            CalibrationDetail.Setup(n == 1);
         }
     }
 }

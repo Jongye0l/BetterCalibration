@@ -13,19 +13,19 @@ namespace BetterCalibration.Patch {
         [HarmonyPatch(typeof(StateBehaviour), "ChangeState", typeof(Enum))]
         [HarmonyPostfix]
         public static void OnChangeState(Enum newState) {
-            if((States) newState == States.Fail2) ShowCalibrationPopup.Show();
+            if((States) newState == States.Fail2) CalibrationPopup.Show();
             else {
-                ShowCalibrationPopup.Hide();
+                CalibrationPopup.Hide();
                 _lastTooEarly = null;
                 _lastTooLate = null;
             }
-            if((States) newState == States.Start) ShowCalibrationPopup.Timings.Clear();
+            if((States) newState == States.Start) CalibrationPopup.Timings.Clear();
         }
 
         [HarmonyPatch(typeof(scrController), "TogglePauseGame")]
         [HarmonyPostfix]
         public static void ExitPlay() {
-            ShowCalibrationPopup.Hide();
+            CalibrationPopup.Hide();
             _lastTooEarly = null;
             _lastTooLate = null;
         }
@@ -38,7 +38,7 @@ namespace BetterCalibration.Patch {
             if(__result == HitMargin.TooEarly) _lastTooEarly = timing;
             else if(__result == HitMargin.TooLate) _lastTooLate = timing;
             else {
-                ShowCalibrationPopup.Timings.Add(timing);
+                CalibrationPopup.Timings.Add(timing);
                 _lastTooEarly = null;
                 _lastTooLate = null;
             }
@@ -49,8 +49,8 @@ namespace BetterCalibration.Patch {
         public static void MissCheck(HitMargin hit) {
             if(hit != HitMargin.FailMiss) return;
             if(_lastTooEarly == null || _lastTooLate == null) return;
-            ShowCalibrationPopup.Timings.Add((float) _lastTooLate);
-            ShowCalibrationPopup.Timings.Add((float) _lastTooEarly);
+            CalibrationPopup.Timings.Add((float) _lastTooLate);
+            CalibrationPopup.Timings.Add((float) _lastTooEarly);
             _lastTooLate = null;
             _lastTooEarly = null;
         }

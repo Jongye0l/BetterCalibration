@@ -495,8 +495,9 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="GUI\CalibrationDetail.cs" />
         <Compile Include="GUI\SettingGUI.cs" />
-        <Compile Include="GUI\ShowCalibrationPopup.cs" />
+        <Compile Include="GUI\CalibrationPopup.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="Patch\CalibrationPatch.cs" />
         <Compile Include="Patch\DeathCaliPatch.cs" />

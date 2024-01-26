@@ -5,14 +5,14 @@ using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace BetterCalibration.GUI {
-    public class ShowCalibrationPopup {
+    public class CalibrationPopup {
         private static GameObject _gameObject;
         private static Text _popupText;
-        public static List<float> Timings = new List<float>();
-        private static int ChangeOffset;
+        public static readonly List<float> Timings = new List<float>();
+        private static int _changeOffset;
 
         public static void Initialize() {
-            _gameObject = new GameObject("BetterCalibration Object");
+            _gameObject = new GameObject("Calibration Popup Object");
             Canvas canvas = CreateCanvas();
             _gameObject.AddComponent<GraphicRaycaster>();
             CreateBackground(canvas);
@@ -79,12 +79,12 @@ namespace BetterCalibration.GUI {
 
         private static void SetupText() {
             int original = scrConductor.currentPreset.inputOffset;
-            ChangeOffset = original + GetTimingAverage();
-            _popupText.text = string.Format(Main.GetValues().ChangeOffset, original, ChangeOffset);
+            _changeOffset = original + GetTimingAverage();
+            _popupText.text = string.Format(Main.GetValues().ChangeOffset, original, _changeOffset);
         }
 
         private static void Yes() {
-            scrConductor.currentPreset.inputOffset = ChangeOffset;
+            scrConductor.currentPreset.inputOffset = _changeOffset;
             scrConductor.SaveCurrentPreset();
             Hide();
         }
