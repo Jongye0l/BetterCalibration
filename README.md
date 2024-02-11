@@ -1,4 +1,8 @@
 # BetterCalibration
+![C#](https://img.shields.io/badge/Lang-Csharp-c9c8e4.svg?&logo=csharp)
+![Rider](https://img.shields.io/badge/IDE-Rider-c9c8e4.svg?&logo=rider)
+![Download](https://img.shields.io/github/downloads/Jongye0l/BetterCalibration/BetterCalibration.zip)
+
 ---
 ### 소개 Information
 * 얼불춤에 보정 기능을 더 좋도록 만듭니다.
@@ -27,3 +31,5 @@
 ### 테스트 환경 Test environment
 * Windows 11
 * A Dance of Fire and Ice 2.6.4(r121, 9248fb6)
+---
+# [Join My Discord!](https://discord.jongyeol.kr)
