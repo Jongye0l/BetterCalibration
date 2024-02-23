@@ -48,7 +48,10 @@ namespace BetterCalibration.Patch {
         [HarmonyPatch(typeof(scrCalibrationPlanet), "GetOffset")]
         [HarmonyPostfix]
         public static void SetOffset(ref double __result) {
-            if(!Settings.UseMinimum) return;
+            if(!Settings.UseMinimum) {
+                CalibrationDetail.CheckTiming(__result * 1000);
+                return;
+            }
             double time360 = 30000 / _bpm;
             double result = __result * 1000;
             while(result < Settings.Minimum) result += time360;
