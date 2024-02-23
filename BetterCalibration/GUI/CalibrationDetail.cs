@@ -11,12 +11,17 @@ namespace BetterCalibration.GUI {
         private static float? _min;
         
         public static void Initialize(scrCalibrationPlanet instance) {
-            _text = instance.txtResults;
-            _timings = instance.listOffsets;
+            if(Settings.Instance.Detail) {
+                _text = instance.txtResults;
+                _timings = instance.listOffsets;
+            } else {
+                _text = null;
+                _timings = null;
+            }
         }
 
         public static void LoadText() {
-            _text.text = string.Format(Main.GetValues().CalibrationDetail, GetTimingAverage(), Mathf.RoundToInt(_max ?? 0), Mathf.RoundToInt(_min ?? 0));
+            if(_text) _text.text = string.Format(Main.GetValues().CalibrationDetail, GetTimingAverage(), Mathf.RoundToInt(_max ?? 0), Mathf.RoundToInt(_min ?? 0));
         }
 
         private static int GetTimingAverage() {
@@ -24,13 +29,14 @@ namespace BetterCalibration.GUI {
         }
 
         public static void Setup(bool b) {
-            if(_text == null) return;
+            if(!_text) return;
             _text.fontSize = b ? 30 : 40;
             _max = null;
             _min = null;
         }
 
         public static void CheckTiming(double timing) {
+            if(!_text) return;
             if(_max == null || timing > _max) _max = (float) timing;
             if(_min == null || timing < _min) _min = (float) timing;
         }
