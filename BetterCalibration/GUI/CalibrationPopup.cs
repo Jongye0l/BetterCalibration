@@ -94,6 +94,7 @@ namespace BetterCalibration.GUI {
         }
 
         public static void Show() {
+            if(!Settings.Instance.ShowPopup) return;
             if(_gameObject == null) Initialize();
             SetupText();
             Object.DontDestroyOnLoad(_gameObject);
