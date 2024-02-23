@@ -39,6 +39,19 @@
             UseDetail = "較正の詳細結果を表示"
         };
 
+        public static readonly Values Vietnamese = new Values {
+            Key = 3,
+            Pitch = "Tốc Độ Nhạc Cân Bằng",
+            Minimum = "Giá Trị Cân Bằng Nhỏ Nhất",
+            Popup = "Hiện Yêu Cầu Đổi Độ Trễ",
+            ChangeOffset = "Bạn Có Muốn Đổi Độ Trễ Của Bạn từ\n{0}ms sang {1}ms?",
+            Language = "Ngôn Ngữ",
+            Default = "Mặc Định",
+            RepeatSong = "Lặp Lại Nhạc Cân Bằng",
+            CalibrationDetail = "Tr.Bình: {0}ms\nCao Nhất: {1}ms\nNhỏ Nhất: {2}ms",
+            UseDetail = "Hiện Thông Tin Quá Trình Cân Bằng"
+        };
+
         public int Key;
         public string Pitch;
         public string Minimum;

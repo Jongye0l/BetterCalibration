@@ -25,6 +25,7 @@ namespace BetterCalibration.GUI {
             AddLanguageButton(GetSelectText("한국어", Settings.Values == Values.Korean), Values.Korean);
             AddLanguageButton(GetSelectText("English", Settings.Values == Values.English), Values.English);
             AddLanguageButton(GetSelectText("日本語", Settings.Values == Values.Japanese), Values.Japanese);
+            AddLanguageButton(GetSelectText("Tiếng Việt", Settings.Values == Values.Vietnamese), Values.Vietnamese);
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }

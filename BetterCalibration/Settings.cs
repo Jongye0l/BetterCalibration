@@ -17,6 +17,7 @@ namespace BetterCalibration {
                     case 0: return Values.Korean;
                     case 1: return Values.English;
                     case 2: return Values.Japanese;
+                    case 3: return Values.Vietnamese;
                     default: return null;
                 }
             }

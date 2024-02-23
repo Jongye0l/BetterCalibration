@@ -36,7 +36,8 @@ namespace BetterCalibration {
         public static Values GetValues() {
             return Settings.Values ??
                    (RDString.language == SystemLanguage.Korean ? Values.Korean :
-                       RDString.language == SystemLanguage.Japanese ? Values.Japanese : Values.English);
+                       RDString.language == SystemLanguage.Japanese ? Values.Japanese : 
+                       RDString.language == SystemLanguage.Vietnamese ? Values.Vietnamese : Values.English);
         }
     }
 }
