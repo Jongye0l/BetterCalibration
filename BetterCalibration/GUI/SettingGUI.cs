@@ -43,15 +43,10 @@ namespace BetterCalibration.GUI {
         }
 
         private static void AddSettingToggle(ref bool value, string text) {
-            if(GUILayout.Toggle(value, text)) {
-                if(!value) {
-                    value = true;
-                    Settings.Save();
-                }
-            } else if(value) {
-                value = false;
-                Settings.Save();
-            }
+            bool result = GUILayout.Toggle(value, text);
+            if(value == result) return;
+            value = result;
+            Settings.Save();
         }
 
         private static void AddSettingToggleInt(ref int value, int defaultValue, ref bool value2, ref string valueString, string text) {
