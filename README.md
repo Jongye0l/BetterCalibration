@@ -26,10 +26,10 @@
 * Windows 11
 * Rider 2023.3.4
 * .NET Framework 4.8
-* A Dance of Fire and Ice 2.7.0(r121, 5032090)
+* A Dance of Fire and Ice 2.7.0(r122, 98caf0a)
 ---
 ### 테스트 환경 Test environment
 * Windows 11
-* A Dance of Fire and Ice 2.7.0(r121, 5032090)
+* A Dance of Fire and Ice 2.7.0(r122, 98caf0a)
 ---
 # [Join My Discord!](https://discord.jongyeol.kr)
