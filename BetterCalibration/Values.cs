@@ -10,7 +10,8 @@
             Default = "기본값",
             RepeatSong = "보정 노래 반복횟수",
             CalibrationDetail = "평균: {0}밀리초\n최대: {1}밀리초\n최소: {2}밀리초",
-            UseDetail = "보정 자세한 표시"
+            UseDetail = "보정 자세한 표시",
+            InputOffset = "입력 오프셋"
         };
 
         public static readonly Values English = new Values {
@@ -23,7 +24,8 @@
             Default = "Default",
             RepeatSong = "Calibration Song Repeat",
             CalibrationDetail = "Avg: {0}ms\nMax: {1}ms\nMin: {2}ms",
-            UseDetail = "Show Calibration Detail"
+            UseDetail = "Show Calibration Detail",
+            InputOffset = "Input Offset"
         };
 
         public static readonly Values Japanese = new Values {
@@ -36,7 +38,8 @@
             Default = "既定値",
             RepeatSong = "較正曲の繰り返し数",
             CalibrationDetail = "平均：{0}ms\n最大：{1}ms\n最小：{2}ms",
-            UseDetail = "較正の詳細結果を表示"
+            UseDetail = "較正の詳細結果を表示",
+            InputOffset = "入力オフセット"
         };
 
         public static readonly Values Vietnamese = new Values {
@@ -49,7 +52,8 @@
             Default = "Mặc Định",
             RepeatSong = "Lặp Lại Nhạc Cân Bằng",
             CalibrationDetail = "Tr.Bình: {0}ms\nCao Nhất: {1}ms\nNhỏ Nhất: {2}ms",
-            UseDetail = "Hiện Thông Tin Quá Trình Cân Bằng"
+            UseDetail = "Hiện Thông Tin Quá Trình Cân Bằng",
+            InputOffset = "Độ Trễ Đầu Vào"
         };
 
         public int Key;
@@ -62,5 +66,6 @@
         public string RepeatSong;
         public string CalibrationDetail;
         public string UseDetail;
+        public string InputOffset;
     }
 }

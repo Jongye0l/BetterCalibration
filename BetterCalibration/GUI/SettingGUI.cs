@@ -6,6 +6,7 @@ namespace BetterCalibration.GUI {
     public class SettingGUI {
 
         private static readonly Settings Settings = Main.Settings;
+        private static string offsetString;
 
         public static void OnGUI(UnityModManager.ModEntry modEntry) {
             Values values = Main.GetValues();
@@ -15,6 +16,7 @@ namespace BetterCalibration.GUI {
             AddSettingInt(ref Settings.RepeatSong, 0, ref Settings.RepeatString, values.RepeatSong);
             AddSettingToggle(ref Settings.Detail, values.UseDetail);
             AddSettingToggle(ref Settings.ShowPopup, values.Popup);
+            AddSettingOffset(values.InputOffset);
         }
 
         private static void AddSettingLanguage(string text, string defaultText) {
@@ -103,6 +105,29 @@ namespace BetterCalibration.GUI {
                 value = resultInt;
                 Settings.Save();
             }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+
+        private static void AddSettingOffset(string text) {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(text);
+            GUILayout.Space(4f);
+            int offset = scrConductor.currentPreset.inputOffset;
+            if(offsetString.IsNullOrEmpty() || !int.TryParse(offsetString, out int i) || i != offset) offsetString = offset.ToString();
+            offsetString = GUILayout.TextField(offsetString, GUILayout.Width(50));
+            int resultInt;
+            try {
+                resultInt = offsetString.IsNullOrEmpty() ? offset : int.TryParse(offsetString, out i) ? i : offset;
+            } catch (FormatException) {
+                resultInt = offset;
+            }
+            if(resultInt != offset) {
+                offset = resultInt;
+                scrConductor.currentPreset.inputOffset = offset;
+                scrConductor.SaveCurrentPreset();
+            }
+            GUILayout.Label("ms");
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
