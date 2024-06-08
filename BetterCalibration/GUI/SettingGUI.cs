@@ -58,7 +58,7 @@ namespace BetterCalibration.GUI {
                 }
                 GUILayout.Space(4f);
                 if(valueString == null) valueString = value.ToString();
-                valueString = GUILayout.TextField(valueString, GUILayout.Width(50));
+                valueString = GUILayout.TextField(valueString);
                 int resultInt;
                 try {
                     resultInt = valueString.IsNullOrEmpty() ? defaultValue : int.Parse(valueString);
@@ -84,7 +84,7 @@ namespace BetterCalibration.GUI {
             GUILayout.Label(text);
             GUILayout.Space(4f);
             if(valueString == null) valueString = value.ToString();
-            valueString = GUILayout.TextField(valueString, GUILayout.Width(50));
+            valueString = GUILayout.TextField(valueString);
             int resultInt;
             try {
                 resultInt = valueString.IsNullOrEmpty() ? defaultValue : int.Parse(valueString);
@@ -108,9 +108,13 @@ namespace BetterCalibration.GUI {
             GUILayout.BeginHorizontal();
             GUILayout.Label(text);
             GUILayout.Space(4f);
+            if(GUILayout.Button("-", GUILayout.Width(25))) {
+                scrConductor.currentPreset.inputOffset--;
+                scrConductor.SaveCurrentPreset();
+            }
             int offset = scrConductor.currentPreset.inputOffset;
             if(offsetString.IsNullOrEmpty() || !int.TryParse(offsetString, out int i) || i != offset) offsetString = offset.ToString();
-            offsetString = GUILayout.TextField(offsetString, GUILayout.Width(50));
+            offsetString = GUILayout.TextField(offsetString);
             int resultInt;
             try {
                 resultInt = offsetString.IsNullOrEmpty() ? offset : int.TryParse(offsetString, out i) ? i : offset;
@@ -122,6 +126,10 @@ namespace BetterCalibration.GUI {
                 scrConductor.SaveCurrentPreset();
             }
             GUILayout.Label("ms");
+            if(GUILayout.Button("+", GUILayout.Width(25))) {
+                scrConductor.currentPreset.inputOffset++;
+                scrConductor.SaveCurrentPreset();
+            }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
         }
@@ -131,7 +139,7 @@ namespace BetterCalibration.GUI {
             GUILayout.Label(text);
             GUILayout.Space(4f);
             if(valueString == null) valueString = value.ToString();
-            valueString = GUILayout.TextField(valueString, GUILayout.Width(50));
+            valueString = GUILayout.TextField(valueString);
             float resultFloat;
             try {
                 resultFloat = valueString.IsNullOrEmpty() ? defaultValue : float.Parse(valueString);
