@@ -1,14 +1,12 @@
 ﻿using System;
+using JALib.Core;
 using UnityEngine;
 using UnityModManagerNet;
 
 namespace BetterCalibration.GUI {
     public class SettingGUI {
-
-        private static readonly Settings Settings = Main.Settings;
-
         public static void OnGUI(UnityModManager.ModEntry modEntry) {
-            Values values = Main.GetValues();
+            JALocalization localization = Main.Instance.Localization;
             AddSettingLanguage(values.Language, values.Default);
             AddSettingPitch(ref Settings.Pitch, 100, ref Settings.PitchString, values.Pitch);
             AddSettingToggleInt(ref Settings.Minimum, 0, ref Settings.UseMinimum, ref Settings.MinimumString, values.Minimum);
