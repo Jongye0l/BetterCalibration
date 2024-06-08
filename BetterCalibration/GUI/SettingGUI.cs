@@ -118,8 +118,7 @@ namespace BetterCalibration.GUI {
                 resultInt = offset;
             }
             if(resultInt != offset) {
-                offset = resultInt;
-                scrConductor.currentPreset.inputOffset = offset;
+                scrConductor.currentPreset.inputOffset = resultInt;
                 scrConductor.SaveCurrentPreset();
             }
             GUILayout.Label("ms");

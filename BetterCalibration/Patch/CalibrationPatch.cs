@@ -77,5 +77,11 @@ namespace BetterCalibration.Patch {
         public static void Setup(int n) {
             CalibrationDetail.Setup(n == 1);
         }
+        
+        [HarmonyPatch(typeof(PauseMenu), "ShowSettingsMenu")]
+        [HarmonyPrefix]
+        public static void ShowSettingsMenu(PauseMenu __instance) {
+            __instance.settingsMenu.offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset.ToString();
+        }
     }
 }
