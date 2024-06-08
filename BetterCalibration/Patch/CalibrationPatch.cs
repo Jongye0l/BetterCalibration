@@ -81,7 +81,8 @@ namespace BetterCalibration.Patch {
         [HarmonyPatch(typeof(PauseMenu), "ShowSettingsMenu")]
         [HarmonyPrefix]
         public static void ShowSettingsMenu(PauseMenu __instance) {
-            __instance.settingsMenu.offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset.ToString();
+            PauseSettingButton offset = __instance.settingsMenu.offsetButton;
+            offset.valueLabel.text = scrConductor.currentPreset.inputOffset + offset.unit;
         }
     }
 }
