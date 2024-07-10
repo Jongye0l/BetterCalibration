@@ -5,6 +5,10 @@ using UnityModManagerNet;
 
 namespace BetterCalibration.GUI {
     public class SettingGUI {
+
+        private static readonly Settings Settings = Main.Settings;
+        private static string offsetString;
+
         public static void OnGUI(UnityModManager.ModEntry modEntry) {
             JALocalization localization = Main.Instance.Localization;
             AddSettingLanguage(values.Language, values.Default);
@@ -13,6 +17,7 @@ namespace BetterCalibration.GUI {
             AddSettingInt(ref Settings.RepeatSong, 0, ref Settings.RepeatString, values.RepeatSong);
             AddSettingToggle(ref Settings.Detail, values.UseDetail);
             AddSettingToggle(ref Settings.ShowPopup, values.Popup);
+            AddSettingOffset(values.InputOffset);
         }
 
         private static void AddSettingLanguage(string text, string defaultText) {
@@ -39,15 +44,10 @@ namespace BetterCalibration.GUI {
         }
 
         private static void AddSettingToggle(ref bool value, string text) {
-            if(GUILayout.Toggle(value, text)) {
-                if(!value) {
-                    value = true;
-                    Settings.Save();
-                }
-            } else if(value) {
-                value = false;
-                Settings.Save();
-            }
+            bool result = GUILayout.Toggle(value, text);
+            if(value == result) return;
+            value = result;
+            Settings.Save();
         }
 
         private static void AddSettingToggleInt(ref int value, int defaultValue, ref bool value2, ref string valueString, string text) {
@@ -59,7 +59,7 @@ namespace BetterCalibration.GUI {
                 }
                 GUILayout.Space(4f);
                 if(valueString == null) valueString = value.ToString();
-                valueString = GUILayout.TextField(valueString, GUILayout.Width(50));
+                valueString = GUILayout.TextField(valueString);
                 int resultInt;
                 try {
                     resultInt = valueString.IsNullOrEmpty() ? defaultValue : int.Parse(valueString);
@@ -85,7 +85,7 @@ namespace BetterCalibration.GUI {
             GUILayout.Label(text);
             GUILayout.Space(4f);
             if(valueString == null) valueString = value.ToString();
-            valueString = GUILayout.TextField(valueString, GUILayout.Width(50));
+            valueString = GUILayout.TextField(valueString);
             int resultInt;
             try {
                 resultInt = valueString.IsNullOrEmpty() ? defaultValue : int.Parse(valueString);
@@ -105,12 +105,42 @@ namespace BetterCalibration.GUI {
             GUILayout.EndHorizontal();
         }
 
+        private static void AddSettingOffset(string text) {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(text);
+            GUILayout.Space(4f);
+            if(GUILayout.Button("-", GUILayout.Width(25))) {
+                scrConductor.currentPreset.inputOffset--;
+                scrConductor.SaveCurrentPreset();
+            }
+            int offset = scrConductor.currentPreset.inputOffset;
+            if(offsetString.IsNullOrEmpty() || !int.TryParse(offsetString, out int i) || i != offset) offsetString = offset.ToString();
+            offsetString = GUILayout.TextField(offsetString);
+            int resultInt;
+            try {
+                resultInt = offsetString.IsNullOrEmpty() ? offset : int.TryParse(offsetString, out i) ? i : offset;
+            } catch (FormatException) {
+                resultInt = offset;
+            }
+            if(resultInt != offset) {
+                scrConductor.currentPreset.inputOffset = resultInt;
+                scrConductor.SaveCurrentPreset();
+            }
+            GUILayout.Label("ms");
+            if(GUILayout.Button("+", GUILayout.Width(25))) {
+                scrConductor.currentPreset.inputOffset++;
+                scrConductor.SaveCurrentPreset();
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+        }
+
         private static void AddSettingPitch(ref float value, float defaultValue, ref string valueString, string text) {
             GUILayout.BeginHorizontal();
             GUILayout.Label(text);
             GUILayout.Space(4f);
             if(valueString == null) valueString = value.ToString();
-            valueString = GUILayout.TextField(valueString, GUILayout.Width(50));
+            valueString = GUILayout.TextField(valueString);
             float resultFloat;
             try {
                 resultFloat = valueString.IsNullOrEmpty() ? defaultValue : float.Parse(valueString);
