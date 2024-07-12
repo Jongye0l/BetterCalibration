@@ -502,10 +502,8 @@
         <Compile Include="Features\CalibrationPopup.cs" />
         <Compile Include="Features\CalibrationSong.cs" />
         <Compile Include="Features\CalibrationDetail.cs" />
-        <Compile Include="GUI\SettingGUI.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="Settings.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

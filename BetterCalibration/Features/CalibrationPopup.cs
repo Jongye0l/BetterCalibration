@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace BetterCalibration.Features;
 
-public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup), patchClass: typeof(CalibrationPopup)) {
+public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup), true, typeof(CalibrationPopup)) {
     private static float? _lastTooEarly;
     private static float? _lastTooLate;
     private static GameObject _gameObject;
@@ -18,11 +18,11 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
     private static List<float> _timings;
     private static int _changeOffset;
 
-    public override void OnEnable() {
+    protected override void OnEnable() {
         _timings = [];
     }
 
-    public override void OnDisable() {
+    protected override void OnDisable() {
         _lastTooEarly = null;
         _lastTooLate = null;
         _timings.Clear();
@@ -32,7 +32,7 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
         _gameObject = null;
     }
 
-    [JAPatch("CalibrationPopup.ChageState", typeof(StateBehaviour), "ChangeState", PatchType.Postfix, true, argumentTypesType: [typeof(Enum)])]
+    [JAPatch(typeof(StateBehaviour), "ChangeState", PatchType.Postfix, true, ArgumentTypesType = [typeof(Enum)])]
     public static void OnChangeState(Enum newState) {
         if((States) newState == States.Fail2) Show();
         else {
@@ -43,14 +43,14 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
         if((States) newState == States.Start) _timings.Clear();
     }
 
-    [JAPatch("CalibrationPopup.ExitPlay", typeof(scrController), "TogglePauseGame", PatchType.Postfix, true)]
+    [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, true)]
     public static void ExitPlay() {
         Hide();
         _lastTooEarly = null;
         _lastTooLate = null;
     }
     
-    [JAPatch("CalibrationPopup.GetTiming", typeof(scrMisc), "GetHitMargin", PatchType.Postfix, true)]
+    [JAPatch(typeof(scrMisc), "GetHitMargin", PatchType.Postfix, true)]
     public static void GetTiming(float hitangle, float refangle, bool isCW, float bpmTimesSpeed, float conductorPitch, HitMargin __result) {
         float angle = (hitangle - refangle) * (isCW ? 1 : -1) * 57.29578f;
         float timing = angle / 180 / bpmTimesSpeed / conductorPitch * 60000;
@@ -69,7 +69,7 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
         }
     }
 
-    [JAPatch("CalibrationPopup.CheckMiss", typeof(scrMistakesManager), "AddHit", PatchType.Postfix, true)]
+    [JAPatch(typeof(scrMistakesManager), "AddHit", PatchType.Postfix, true)]
     public static void MissCheck(HitMargin hit) {
         if(hit != HitMargin.FailMiss) return;
         if(_lastTooEarly == null || _lastTooLate == null) return;
@@ -79,7 +79,7 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
         _lastTooEarly = null;
     }
     
-    [JAPatch("CalibrationPopup.CheckSettingMenu", typeof(PauseMenu), "ShowSettingsMenu", PatchType.Prefix, true)]
+    [JAPatch(typeof(PauseMenu), "ShowSettingsMenu", PatchType.Prefix, true)]
     public static void ShowSettingsMenu(PauseMenu __instance) {
         __instance.settingsMenu.offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset.ToString();
     }
@@ -152,7 +152,7 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
     private static void SetupText() {
         int original = scrConductor.currentPreset.inputOffset;
         _changeOffset = original + GetTimingAverage();
-        _popupText.text = string.Format(Main.Instance.Localization.Get("Popup.ChangeOffset"), original, _changeOffset);
+        _popupText.text = string.Format(Main.Instance.Localization["Popup.ChangeOffset"], original, _changeOffset);
     }
 
     private static void Yes() {
@@ -166,7 +166,6 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
     }
 
     private static void Show() {
-        if(!Settings.Instance.ShowPopup) return;
         if(!_gameObject) Initialize();
         SetupText();
         Object.DontDestroyOnLoad(_gameObject);
