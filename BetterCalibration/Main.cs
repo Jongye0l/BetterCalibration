@@ -10,7 +10,7 @@ public class Main : JAMod {
     public static Main Instance;
     public static SettingGUI SettingGUI;
 
-    private Main(UnityModManager.ModEntry modEntry) : base(modEntry, true) {
+    private Main(UnityModManager.ModEntry modEntry) : base(modEntry, true, gid: 1929334982) {
         Instance = this;
         SettingGUI = new SettingGUI(this);
         AddFeature(new CalibrationPopup(), new CalibrationDetail(), new CalibrationSong());
