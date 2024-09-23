@@ -1,6 +1,7 @@
 ﻿using System;
 using BetterCalibration.Features;
 using JALib.Core;
+using JALib.Core.Patch;
 using JALib.Tools;
 using UnityEngine;
 using UnityModManagerNet;
@@ -11,11 +12,21 @@ public class Main : JAMod {
     public static Main Instance;
     public static SettingGUI SettingGUI;
     private static string offsetString;
+    private static JAPatcher Patcher;
 
     private Main(UnityModManager.ModEntry modEntry) : base(modEntry, true, gid: 1929334982) {
         Instance = this;
         SettingGUI = new SettingGUI(this);
         AddFeature(new CalibrationPopup(), new CalibrationDetail(), new CalibrationSong());
+        Patcher = new JAPatcher(this).AddPatch(ShowSettingsMenu);
+    }
+
+    protected override void OnEnable() {
+        Patcher.Patch();
+    }
+
+    protected override void OnDisable() {
+        Patcher.Unpatch();
     }
 
     protected override void OnGUI() {
@@ -70,5 +81,11 @@ public class Main : JAMod {
 
     private static string GetSelectText(string text, bool selected) {
         return string.Format(selected ? "<b>{0}</b>" : "{0}", text);
+    }
+
+    [JAPatch(typeof(PauseMenu), "ShowSettingsMenu", PatchType.Prefix, true)]
+    public static void ShowSettingsMenu(PauseMenu __instance) {
+        PauseSettingButton offset = __instance.settingsMenu.offsetButton;
+        if(offset) offset.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + offset.unit);
     }
 }

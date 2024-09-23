@@ -78,12 +78,6 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
         _lastTooLate = null;
         _lastTooEarly = null;
     }
-    
-    [JAPatch(typeof(PauseMenu), "ShowSettingsMenu", PatchType.Prefix, true)]
-    public static void ShowSettingsMenu(PauseMenu __instance) {
-        PauseSettingButton offset = __instance.settingsMenu.offsetButton;
-        if(offset) offset.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + offset.unit);
-    }
 
     private static void Initialize() {
         _gameObject = new GameObject("Calibration Popup Canvas");
