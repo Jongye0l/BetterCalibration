@@ -81,7 +81,8 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
     
     [JAPatch(typeof(PauseMenu), "ShowSettingsMenu", PatchType.Prefix, true)]
     public static void ShowSettingsMenu(PauseMenu __instance) {
-        __instance.settingsMenu.offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset.ToString();
+        PauseSettingButton offset = __instance.settingsMenu.offsetButton;
+        if(offset) offset.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + offset.unit);
     }
 
     private static void Initialize() {
