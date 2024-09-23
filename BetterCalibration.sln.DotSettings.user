@@ -156,6 +156,7 @@
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CA_0020Dance_0020of_0020Fire_0020and_0020Ice_005CA_0020Dance_0020of_0020Fire_0020and_0020Ice_005FData_005CManaged_005CUnityEngine_002EWindModule_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CA_0020Dance_0020of_0020Fire_0020and_0020Ice_005CA_0020Dance_0020of_0020Fire_0020and_0020Ice_005FData_005CManaged_005CUnityEngine_002EXRModule_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CA_0020Dance_0020of_0020Fire_0020and_0020Ice_005CA_0020Dance_0020of_0020Fire_0020and_0020Ice_005FData_005CManaged_005CXTUtilities_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CSteamLibrary_005Csteamapps_005Ccommon_005CA_0020Dance_0020of_0020Fire_0020and_0020Ice_005CMods_005CJALib_005CJALib_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=V_003A_005CJALib_005CJALib_005Cbin_005CDebug_005CJALib_002Edll/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="D:\SteamLibrary\steamapps\common\A Dance of Fire and Ice\Mods\DesyncFix\DesyncFix.dll" /&gt;&#xD;

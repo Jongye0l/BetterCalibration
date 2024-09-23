@@ -77,7 +77,7 @@
           <HintPath>D:\SteamLibrary\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed\I18N.West.dll</HintPath>
         </Reference>
         <Reference Include="JALib">
-          <HintPath>..\..\JALib\JALib\bin\Debug\JALib.dll</HintPath>
+          <HintPath>D:\SteamLibrary\steamapps\common\A Dance of Fire and Ice\Mods\JALib\JALib.dll</HintPath>
         </Reference>
         <Reference Include="Mono.Data.Sqlite">
           <HintPath>D:\SteamLibrary\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice_Data\Managed\Mono.Data.Sqlite.dll</HintPath>
@@ -516,8 +516,6 @@
 
     <Target Name="AfterBuild">
         <Copy SourceFiles="bin/Debug/BetterCalibration.dll" DestinationFolder="D:\SteamLibrary\steamapps\common\A Dance of Fire and Ice\Mods\BetterCalibration"/>
-        <Exec Command="taskkill /f /im &quot;A Dance*&quot; || exit 0"/>
-        <Exec Command="explorer steam://rungameid/977950 || exit 0"/>
     </Target>
 
 </Project>
