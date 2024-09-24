@@ -1,11 +1,12 @@
 ﻿using JALib.Core;
 using JALib.Core.Patch;
 using JALib.Core.Setting;
+using JALib.Tools;
 using Newtonsoft.Json.Linq;
 
 namespace BetterCalibration.Features;
 
-public class CalibrationSong() : Feature(Main.Instance, nameof(CalibrationSong), false, typeof(CalibrationSong)) {
+public class CalibrationSong() : Feature(Main.Instance, nameof(CalibrationSong), false, typeof(CalibrationSong), typeof(CalibrationSongSettings)) {
     
     private static CalibrationSongSettings Settings;
     private static float _bpm;
@@ -17,9 +18,10 @@ public class CalibrationSong() : Feature(Main.Instance, nameof(CalibrationSong),
 
     protected override void OnGUI() {
         JALocalization localization = Main.Instance.Localization;
-        Main.SettingGUI.AddSettingFloat(ref Settings.Pitch, 100, ref _pitch, localization["Song.Pitch"], 0);
-        Main.SettingGUI.AddSettingToggleInt(ref Settings.Minimum, 0, ref Settings.UseMinimum, ref _minimum, localization["Song.Minimum"]);
-        Main.SettingGUI.AddSettingInt(ref Settings.RepeatSong, 0, ref _repeat, localization["Song.Repeat"], 0);
+        SettingGUI settingGUI = Main.SettingGUI;
+        settingGUI.AddSettingFloat(ref Settings.Pitch, 100, ref _pitch, localization["Song.Pitch"], 0);
+        settingGUI.AddSettingToggleInt(ref Settings.Minimum, 0, ref Settings.UseMinimum, ref _minimum, localization["Song.Minimum"]);
+        settingGUI.AddSettingInt(ref Settings.RepeatSong, 0, ref _repeat, localization["Song.Repeat"], 0);
     }
 
     [JAPatch(typeof(scrCalibrationPlanet), "Start", PatchType.Postfix, false)]

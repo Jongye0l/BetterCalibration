@@ -499,9 +499,12 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="DoubleFeaturePatch\DoubleFeaturePatch.cs" />
+        <Compile Include="DoubleFeaturePatch\Timing.cs" />
         <Compile Include="Features\CalibrationPopup.cs" />
         <Compile Include="Features\CalibrationSong.cs" />
         <Compile Include="Features\CalibrationDetail.cs" />
+        <Compile Include="Features\TimingLogger.cs" />
         <Compile Include="Main.cs" />
         <Compile Include="Properties\AssemblyInfo.cs"/>
     </ItemGroup>

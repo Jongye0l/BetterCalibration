@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using BetterCalibration.DoubleFeaturePatch;
 using JALib.Core;
 using JALib.Core.Patch;
 using MonsterLove.StateMachine;
@@ -11,22 +11,14 @@ using Object = UnityEngine.Object;
 namespace BetterCalibration.Features;
 
 public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup), true, typeof(CalibrationPopup)) {
-    private static float? _lastTooEarly;
-    private static float? _lastTooLate;
     private static GameObject _gameObject;
     private static Text _popupText;
-    private static List<float> _timings;
     private static int _changeOffset;
 
-    protected override void OnEnable() {
-        _timings = [];
-    }
+    protected override void OnEnable() => Timing.Instance.AddPatch(this);
 
     protected override void OnDisable() {
-        _lastTooEarly = null;
-        _lastTooLate = null;
-        _timings.Clear();
-        _timings = null;
+        Timing.Instance.RemovePatch(this);
         Hide();
         _popupText = null;
         _gameObject = null;
@@ -35,48 +27,7 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
     [JAPatch(typeof(StateBehaviour), "ChangeState", PatchType.Postfix, true, ArgumentTypesType = [typeof(Enum)])]
     public static void OnChangeState(Enum newState) {
         if((States) newState == States.Fail2) Show();
-        else {
-            Hide();
-            _lastTooEarly = null;
-            _lastTooLate = null;
-        }
-        if((States) newState == States.Start) _timings.Clear();
-    }
-
-    [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, true)]
-    public static void ExitPlay() {
-        Hide();
-        _lastTooEarly = null;
-        _lastTooLate = null;
-    }
-    
-    [JAPatch(typeof(scrMisc), "GetHitMargin", PatchType.Postfix, true)]
-    public static void GetTiming(float hitangle, float refangle, bool isCW, float bpmTimesSpeed, float conductorPitch, HitMargin __result) {
-        float angle = (hitangle - refangle) * (isCW ? 1 : -1) * 57.29578f;
-        float timing = angle / 180 / bpmTimesSpeed / conductorPitch * 60000;
-        switch(__result) {
-            case HitMargin.TooEarly:
-                _lastTooEarly = timing;
-                break;
-            case HitMargin.TooLate:
-                _lastTooLate = timing;
-                break;
-            default:
-                _timings.Add(timing);
-                _lastTooEarly = null;
-                _lastTooLate = null;
-                break;
-        }
-    }
-
-    [JAPatch(typeof(scrMistakesManager), "AddHit", PatchType.Postfix, true)]
-    public static void MissCheck(HitMargin hit) {
-        if(hit != HitMargin.FailMiss) return;
-        if(_lastTooEarly == null || _lastTooLate == null) return;
-        _timings.Add((float) _lastTooLate);
-        _timings.Add((float) _lastTooEarly);
-        _lastTooLate = null;
-        _lastTooEarly = null;
+        else Hide();
     }
 
     private static void Initialize() {
@@ -156,9 +107,7 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
         Hide();
     }
 
-    private static int GetTimingAverage() {
-        return _timings.Count == 0 ? 0 : Mathf.RoundToInt(_timings.Sum() / _timings.Count);
-    }
+    private static int GetTimingAverage() => Timing.Timings.Count == 0 ? 0 : Mathf.RoundToInt(Timing.Timings.Average());
 
     private static void Show() {
         if(!_gameObject) Initialize();
@@ -167,6 +116,7 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
         Cursor.visible = true;
     }
 
+    [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, true)]
     private static void Hide() {
         if(!_gameObject) return;
         Object.DestroyImmediate(_gameObject);
