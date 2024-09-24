@@ -110,7 +110,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     public static void LogTiming() {
         if(_logging || Timing.Timings.Count == 0) return;
         byte[] mapHash = GetMapHash();
-        float timing = Timing.Timings.Average();
+        float timing = scrConductor.currentPreset.inputOffset + Timing.Timings.Average();
         AddTiming(mapHash, timing, _settings.MaxTimingsPerMap);
         AddTiming([], timing, _settings.MaxTimings);
         _logging = true;
@@ -216,8 +216,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         fileStream.WriteObject(_timings);
     }
 
-    public class TimingLoggerSettings : JASetting {
-
+    private class TimingLoggerSettings : JASetting {
         public int MaxTimings = 15;
         public int MaxTimingsPerMap = 5;
 
