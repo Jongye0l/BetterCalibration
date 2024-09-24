@@ -17,7 +17,7 @@ public class Main : JAMod {
     private Main(UnityModManager.ModEntry modEntry) : base(modEntry, true, gid: 1929334982) {
         Instance = this;
         SettingGUI = new SettingGUI(this);
-        AddFeature(new CalibrationPopup(), new CalibrationDetail(), new CalibrationSong(), new TimingLogger());
+        AddFeature(new CalibrationPopup(), new CalibrationDetail(), new CalibrationSong(), new TimingLogger(), new FloatOffset());
         Patcher = new JAPatcher(this).AddPatch(ShowSettingsMenu);
     }
 
