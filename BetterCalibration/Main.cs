@@ -33,11 +33,11 @@ public class Main : JAMod {
         GUILayout.BeginHorizontal();
         GUILayout.Label(Localization["Language"]);
         GUILayout.Space(4f);
-        AddLanguageButton(GetSelectText(Localization["Language.Default"], CustomLanguage == null), null);
-        AddLanguageButton(GetSelectText("한국어", CustomLanguage == SystemLanguage.Korean), SystemLanguage.Korean);
-        AddLanguageButton(GetSelectText("English", CustomLanguage == SystemLanguage.English), SystemLanguage.English);
-        AddLanguageButton(GetSelectText("日本語", CustomLanguage == SystemLanguage.Japanese), SystemLanguage.Japanese);
-        AddLanguageButton(GetSelectText("Tiếng Việt", CustomLanguage == SystemLanguage.Vietnamese), SystemLanguage.Vietnamese);
+        AddLanguageButton(Localization["Language.Default"], null);
+        AddLanguageButton("한국어", SystemLanguage.Korean);
+        AddLanguageButton("English", SystemLanguage.English);
+        AddLanguageButton("日本語", SystemLanguage.Japanese);
+        AddLanguageButton("Tiếng Việt", SystemLanguage.Vietnamese);
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();
     }
@@ -75,7 +75,7 @@ public class Main : JAMod {
     protected override void OnHideGUI() => offsetString = null;
 
     private void AddLanguageButton(string text, SystemLanguage? lang) {
-        if(!GUILayout.Button(text)) return;
+        if(!GUILayout.Button(GetSelectText(text, CustomLanguage == lang))) return;
         CustomLanguage = lang;
     }
 
