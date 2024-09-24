@@ -41,7 +41,7 @@ public class CalibrationDetail() : Feature(Main.Instance, nameof(CalibrationDeta
 
     [JAPatch(typeof(scrCalibrationPlanet), "PutDataPoint", PatchType.Postfix, true)]
     public static void ReloadText() {
-        if(_text) _text.text = string.Format(Main.Instance.Localization.Get("Cablibration.Detail"), GetTimingAverage(), Mathf.RoundToInt(_max ?? 0), Mathf.RoundToInt(_min ?? 0));
+        if(_text) _text.text = string.Format(Main.Instance.Localization.Get("Cablibration.Detail"), ToStringAuto(GetTimingAverage()), ToStringAuto(_max ?? 0), ToStringAuto(_min ?? 0));
     }
 
     [JAPatch(typeof(scrCalibrationPlanet), "SetMessageNumber", PatchType.Postfix, true)]
@@ -52,7 +52,11 @@ public class CalibrationDetail() : Feature(Main.Instance, nameof(CalibrationDeta
         _min = null;
     }
 
-    private static int GetTimingAverage() {
-        return _timings.Count == 0 ? 0 : Mathf.RoundToInt((float) (_timings.Sum() / _timings.Count) * 1000);
+    private static string ToStringAuto(float f) {
+        return FloatOffset.Instance.Enabled ? f.ToString("0.##") : Mathf.RoundToInt(f).ToString();
+    }
+
+    private static float GetTimingAverage() {
+        return _timings.Count == 0 ? 0f : (float) (_timings.Sum() / _timings.Count) * 1000;
     }
 }

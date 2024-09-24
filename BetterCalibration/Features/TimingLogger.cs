@@ -55,13 +55,19 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                 GUILayout.BeginArea(new Rect(0, 0, width, height), new GUIStyle(GUI.skin.box));
                     GUILayout.BeginHorizontal();
                         GUILayout.BeginVertical();
-                            foreach(float timing in allTimings) GUILayout.Label(timing.ToString("N0"), GUILayout.Height(buttonSize.y));
+                            foreach(float timing in allTimings) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
+                                                                                    : Mathf.RoundToInt(timing).ToString(), GUILayout.Height(buttonSize.y));
                         GUILayout.EndVertical();
                         GUILayout.FlexibleSpace();
                         GUILayout.BeginVertical();
                             foreach(float timing in allTimings.Where(_ => GUILayout.Button(buttonContent))) {
-                                if(scrConductor.currentPreset.inputOffset == (int) timing) continue;
-                                scrConductor.currentPreset.inputOffset = (int) timing;
+                                if(FloatOffset.Instance.Enabled) {
+                                    FloatOffset.Instance.Offset = timing;
+                                    continue;
+                                }
+                                int roundedTiming = Mathf.RoundToInt(timing);
+                                if(scrConductor.currentPreset.inputOffset == roundedTiming) continue;
+                                scrConductor.currentPreset.inputOffset = roundedTiming;
                                 scrConductor.SaveCurrentPreset();
                             }
                         GUILayout.EndVertical();
@@ -77,13 +83,19 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                     if(inGame) {
                         GUILayout.BeginHorizontal();
                             GUILayout.BeginVertical();
-                                foreach(float timing in allTimings) GUILayout.Label(timing.ToString("N0"), GUILayout.Height(buttonSize.y));
+                                foreach(float timing in allTimings) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
+                                                                                        : Mathf.RoundToInt(timing).ToString(), GUILayout.Height(buttonSize.y));
                             GUILayout.EndVertical();
                             GUILayout.FlexibleSpace();
                             GUILayout.BeginVertical();
                                 foreach(float timing in allTimings.Where(_ => GUILayout.Button(buttonContent))) {
-                                    if(scrConductor.currentPreset.inputOffset == (int) timing) continue;
-                                    scrConductor.currentPreset.inputOffset = (int) timing;
+                                    if(FloatOffset.Instance.Enabled) {
+                                        FloatOffset.Instance.Offset = timing;
+                                        continue;
+                                    }
+                                    int roundedTiming = Mathf.RoundToInt(timing);
+                                    if(scrConductor.currentPreset.inputOffset == roundedTiming) continue;
+                                    scrConductor.currentPreset.inputOffset = roundedTiming;
                                     scrConductor.SaveCurrentPreset();
                                 }
                             GUILayout.EndVertical();

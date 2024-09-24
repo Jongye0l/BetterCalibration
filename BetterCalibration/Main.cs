@@ -11,7 +11,7 @@ namespace BetterCalibration;
 public class Main : JAMod {
     public static Main Instance;
     public static SettingGUI SettingGUI;
-    private static string offsetString;
+    public static string offsetString;
     private static JAPatcher Patcher;
 
     private Main(UnityModManager.ModEntry modEntry) : base(modEntry, true, gid: 1929334982) {
@@ -43,6 +43,7 @@ public class Main : JAMod {
     }
 
     protected override void OnGUIBehind() {
+        if(FloatOffset.Instance.Enabled) return;
         GUILayout.BeginHorizontal();
         GUILayout.Label(Localization["InputOffset"]);
         GUILayout.Space(4f);
@@ -84,8 +85,10 @@ public class Main : JAMod {
     }
 
     [JAPatch(typeof(PauseMenu), "ShowSettingsMenu", PatchType.Prefix, true)]
-    public static void ShowSettingsMenu(PauseMenu __instance) {
+    private static void ShowSettingsMenu(PauseMenu __instance) {
         PauseSettingButton offset = __instance.settingsMenu.offsetButton;
-        if(offset) offset.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + offset.unit);
+        if(!offset) return;
+        if(FloatOffset.Instance.Enabled) FloatOffset.Instance.SetOffsetSettingString(offset);
+        else offset.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + offset.unit);
     }
 }

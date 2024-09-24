@@ -13,7 +13,7 @@ namespace BetterCalibration.Features;
 public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup), true, typeof(CalibrationPopup)) {
     private static GameObject _gameObject;
     private static Text _popupText;
-    private static int _changeOffset;
+    private static float _changeOffset;
 
     protected override void OnEnable() => Timing.Instance.AddPatch(this);
 
@@ -96,18 +96,33 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
     }
 
     private static void SetupText() {
-        int original = scrConductor.currentPreset.inputOffset;
-        _changeOffset = original + GetTimingAverage();
-        _popupText.text = string.Format(Main.Instance.Localization["Popup.ChangeOffset"], original, _changeOffset);
+        string original;
+        string changed;
+        _changeOffset = GetTimingAverage();
+        if(FloatOffset.Instance.Enabled) {
+            int i = scrConductor.currentPreset.inputOffset;
+            _changeOffset += i;
+            original = i.ToString();
+            changed = Mathf.RoundToInt(_changeOffset).ToString();
+        } else {
+            float f = FloatOffset.Instance.Offset;
+            _changeOffset += f;
+            original = f.ToString("0.##");
+            changed = _changeOffset.ToString("0.##");
+        }
+        _popupText.text = string.Format(Main.Instance.Localization["Popup.ChangeOffset"], original, changed);
     }
 
     private static void Yes() {
-        scrConductor.currentPreset.inputOffset = _changeOffset;
-        scrConductor.SaveCurrentPreset();
+        if(FloatOffset.Instance.Enabled) FloatOffset.Instance.Offset = _changeOffset;
+        else {
+            scrConductor.currentPreset.inputOffset = Mathf.RoundToInt(_changeOffset);
+            scrConductor.SaveCurrentPreset();
+        }
         Hide();
     }
 
-    private static int GetTimingAverage() => Timing.Timings.Count == 0 ? 0 : Mathf.RoundToInt(Timing.Timings.Average());
+    private static float GetTimingAverage() => Timing.Timings.Count == 0 ? 0f : Timing.Timings.Average();
 
     private static void Show() {
         if(!_gameObject) Initialize();
