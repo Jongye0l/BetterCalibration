@@ -186,7 +186,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
             if(File.Exists("Timings.dat")) {
                 using FileStream fileStream = File.OpenRead("Timings.dat");
                 try {
-                    _timings = fileStream.ReadObject<Dictionary<byte[], List<float>>>();
+                    _timings = Zipper.UnDeflateToMemoryStream(fileStream).ReadObject<Dictionary<byte[], List<float>>>();
                 } catch (Exception e) {
                     _timings = new Dictionary<byte[], List<float>>();
                     Main.Instance.LogException(e);
@@ -224,8 +224,10 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     }
 
     public static void SaveTiming() {
-        using FileStream fileStream = File.Create("Timings.dat");
-        fileStream.WriteObject(_timings);
+        using MemoryStream memoryStream = new();
+        memoryStream.WriteObject(_timings);
+        using FileStream fileStream = File.OpenWrite("Timings.dat");
+        fileStream.Deflate(memoryStream);
     }
 
     private class TimingLoggerSettings : JASetting {
