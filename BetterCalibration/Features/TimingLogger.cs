@@ -53,19 +53,19 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                 GUIContent buttonContent = new(localization["TimingLogger.SetTiming"]);
                 Vector2 buttonSize = GUI.skin.button.CalcSize(buttonContent);
                 GUILayout.BeginVertical(new GUIStyle(GUI.skin.box));
-                    if(allTimings.Count == 0) {
+                    if(allTimings.Count <= 1) {
                         GUILayout.BeginVertical();
                             GUILayout.Label(localization["TimingLogger.NoTimings"]);
                         GUILayout.EndVertical();
                     } else {
                         GUILayout.BeginHorizontal();
                             GUILayout.BeginVertical();
-                                foreach(float timing in allTimings) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
+                                foreach(float timing in allTimings.Skip(1)) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
                                                                                         : Mathf.RoundToInt(timing).ToString(), GUILayout.Height(buttonSize.y));
                             GUILayout.EndVertical();
                             GUILayout.FlexibleSpace();
                             GUILayout.BeginVertical();
-                                foreach(float timing in allTimings.Where(_ => GUILayout.Button(buttonContent))) {
+                                foreach(float timing in allTimings.Skip(1).Where(_ => GUILayout.Button(buttonContent))) {
                                     if(FloatOffset.Instance.Enabled) {
                                         FloatOffset.Instance.Offset = timing;
                                         continue;
@@ -75,7 +75,6 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                                     scrConductor.currentPreset.inputOffset = roundedTiming;
                                     scrConductor.SaveCurrentPreset();
                                 }
-                                int roundedTiming = Mathf.RoundToInt(timing);
                             GUILayout.EndVertical();
                         GUILayout.EndHorizontal();
                     }
@@ -95,7 +94,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                             GUILayout.Label(localization["TimingLogger.NotOpenMap"]);
                             GUILayout.FlexibleSpace();
                         GUILayout.EndVertical();
-                    } else if(mapTimings.Count == 0) {
+                    } else if(mapTimings.Count <= 1) {
                         GUILayout.BeginVertical();
                             GUILayout.FlexibleSpace();
                             GUILayout.Label(localization["TimingLogger.NoTimings"]);
@@ -104,12 +103,12 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                     } else {
                         GUILayout.BeginHorizontal();
                             GUILayout.BeginVertical();
-                                foreach(float timing in allTimings) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
+                                foreach(float timing in mapTimings.Skip(1)) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
                                                                                         : Mathf.RoundToInt(timing).ToString(), GUILayout.Height(buttonSize.y));
                             GUILayout.EndVertical();
                             GUILayout.FlexibleSpace();
                             GUILayout.BeginVertical();
-                                foreach(float timing in allTimings.Where(_ => GUILayout.Button(buttonContent))) {
+                                foreach(float timing in mapTimings.Skip(1).Where(_ => GUILayout.Button(buttonContent))) {
                                     if(FloatOffset.Instance.Enabled) {
                                         FloatOffset.Instance.Offset = timing;
                                         continue;
@@ -131,8 +130,10 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     [JAPatch(typeof(StateBehaviour), "ChangeState", PatchType.Postfix, true, ArgumentTypesType = [typeof(Enum)])]
     public static void OnChangeState(Enum newState) {
         States states = (States) newState;
-        if(states == States.Start) _logging = false;
-        else if(states != States.Fail2) LogTiming();
+        if(states == States.Start) {
+            _logging = false;
+            GetTiming(GetMapHash())[0] = FloatOffset.Instance.Enabled ? FloatOffset.Instance.Offset : scrConductor.currentPreset.inputOffset;
+        } else if(states != States.Fail2) LogTiming();
     }
 
     [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, true)]
@@ -146,7 +147,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     }
 
     private static byte[] GetMapHash() {
-        return ADOBase.isOfficialLevel ? Encoding.UTF8.GetBytes(ADOBase.currentLevel) : GetHash();;
+        return ADOBase.isOfficialLevel ? Encoding.UTF8.GetBytes(ADOBase.currentLevel) : GetHash();
     }
 
     private static byte[] GetHash() {
@@ -229,15 +230,15 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     public static void AddTiming(byte[] mapHash, float timing, int maxTiming) {
         _timings = GetTimings();
         List<float> timings;
-        if(!_timings.TryGetValue(mapHash, out List<float> timing1)) timings = _timings[mapHash] = [];
+        if(!_timings.TryGetValue(mapHash, out List<float> timing1)) timings = _timings[mapHash] = [0f];
         else timings = timing1;
         timings.Add(timing);
-        if(timings.Count > maxTiming) timings.RemoveAt(0);
+        if(timings.Count > maxTiming + 1) timings.RemoveAt(1);
         SaveTiming();
     }
 
     public static List<float> GetTiming(byte[] mapHash) {
-        return GetTimings().TryGetValue(mapHash, out List<float> timing) ? timing : [];
+        return GetTimings().TryGetValue(mapHash, out List<float> timing) ? timing : [0f];
     }
 
     public static void SaveTiming() {
