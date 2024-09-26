@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using ADOFAI;
 using BetterCalibration.DoubleFeaturePatch;
-using HarmonyLib;
 using JALib.Core;
 using JALib.Core.Patch;
 using JALib.Core.Setting;
@@ -211,16 +210,24 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
 
     public static Dictionary<byte[], List<float>> GetTimings() {
         if(_timings == null) {
+            _timings = new Dictionary<byte[], List<float>>();
             if(File.Exists(Path.Combine(Main.Instance.Path, "Timings.dat"))) {
                 using FileStream fileStream = File.OpenRead(Path.Combine(Main.Instance.Path, "Timings.dat"));
                 try {
-                    _timings = Zipper.UnDeflateToMemoryStream(fileStream).ReadObject<Dictionary<byte[], List<float>>>();
+                    using Stream stream = Zipper.UnDeflateToMemoryStream(fileStream);
+                    int count = stream.ReadInt();
+                    for(int i = 0; i < count; i++) {
+                        byte[] key = stream.ReadBytes(256);
+                        List<float> value = [];
+                        int valueCount = stream.ReadInt();
+                        for(int j = 0; j < valueCount; j++) value.Add(stream.ReadFloat());
+                        _timings[key] = value;
+                    }
                 } catch (Exception e) {
-                    _timings = new Dictionary<byte[], List<float>>();
                     Main.Instance.LogException(e);
                     SaveTiming();
                 }
-            } else _timings = new Dictionary<byte[], List<float>>();
+            }
             Deleter();
         }
         _lastUseTime = DateTime.Now.Ticks;
@@ -253,7 +260,12 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
 
     public static void SaveTiming() {
         using MemoryStream memoryStream = new();
-        memoryStream.WriteObject(_timings);
+        memoryStream.WriteInt(_timings.Count);
+        foreach(KeyValuePair<byte[],List<float>> valuePair in _timings) {
+            memoryStream.Write(valuePair.Key);
+            memoryStream.WriteInt(valuePair.Value.Count);
+            foreach(float timing in valuePair.Value) memoryStream.WriteFloat(timing);
+        }
         using FileStream fileStream = File.OpenWrite(Path.Combine(Main.Instance.Path, "Timings.dat"));
         fileStream.Deflate(memoryStream);
     }
