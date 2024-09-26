@@ -158,45 +158,55 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         foreach(LevelEvent levelEvent in ADOBase.customLevel.events) {
             switch(levelEvent.eventType) {
                 case LevelEventType.SetSpeed:
-                case LevelEventType.Twirl:
-                case LevelEventType.Hold:
-                case LevelEventType.MultiPlanet:
-                case LevelEventType.Pause:
-                case LevelEventType.AutoPlayTiles:
-                case LevelEventType.ScaleMargin:
-                case LevelEventType.Multitap:
-                case LevelEventType.KillPlayer:
-                    memoryStream.WriteInt((int) levelEvent.eventType);
                     memoryStream.WriteInt(levelEvent.floor);
-                    foreach(object o in levelEvent.data.Values) {
-                        switch(o) {
-                            case int i:
-                                memoryStream.WriteInt(i);
-                                break;
-                            case long l:
-                                memoryStream.WriteLong(l);
-                                break;
-                            case float f:
-                                memoryStream.WriteFloat(f);
-                                break;
-                            case double d:
-                                memoryStream.WriteDouble(d);
-                                break;
-                            case bool b:
-                                memoryStream.WriteBoolean(b);
-                                break;
-                            case string s:
-                                memoryStream.WriteUTF(s);
-                                break;
-                            case Enum e:
-                                memoryStream.WriteUTF(e.ToString());
-                                break;
-                        }
-                    }
+                    memoryStream.WriteByte(0);
+                    levelEvent.Get<SpeedType>("speedType");
+                    memoryStream.WriteByte((byte) levelEvent["speedType"]);
+                    if((SpeedType) levelEvent["speedType"] == SpeedType.Bpm) memoryStream.WriteFloat((float) levelEvent["beatsPerMinute"]);
+                    else memoryStream.WriteFloat((float) levelEvent["bpmMultiplier"]);
+                    break;
+                case LevelEventType.Twirl:
+                    memoryStream.WriteInt(levelEvent.floor);
+                    memoryStream.WriteByte(1);
+                    break;
+                case LevelEventType.Hold:
+                    memoryStream.WriteInt(levelEvent.floor);
+                    memoryStream.WriteByte(2);
+                    memoryStream.WriteFloat((float) levelEvent["duration"]);
+                    break;
+                case LevelEventType.MultiPlanet:
+                    memoryStream.WriteInt(levelEvent.floor);
+                    memoryStream.WriteByte(3);
+                    memoryStream.WriteByte((byte) levelEvent["planets"]);
+                    break;
+                case LevelEventType.Pause:
+                    memoryStream.WriteInt(levelEvent.floor);
+                    memoryStream.WriteByte(4);
+                    memoryStream.WriteFloat((float) levelEvent["duration"]);
+                    break;
+                case LevelEventType.AutoPlayTiles:
+                    memoryStream.WriteInt(levelEvent.floor);
+                    memoryStream.WriteByte(5);
+                    memoryStream.WriteBoolean((bool) levelEvent["enabled"]);
+                    break;
+                case LevelEventType.ScaleMargin:
+                    memoryStream.WriteInt(levelEvent.floor);
+                    memoryStream.WriteByte(6);
+                    memoryStream.WriteFloat((float) levelEvent["scale"]);
+                    break;
+                case LevelEventType.Multitap:
+                    memoryStream.WriteInt(levelEvent.floor);
+                    memoryStream.WriteByte(7);
+                    memoryStream.WriteFloat((float) levelEvent["taps"]);
+                    break;
+                case LevelEventType.KillPlayer:
+                    memoryStream.WriteInt(levelEvent.floor);
+                    memoryStream.WriteByte(8);
                     break;
             }
         }
-        return MD5.Create().ComputeHash(memoryStream.ToArray());
+        using SHA256 sha256 = SHA256.Create();
+        return sha256.ComputeHash(memoryStream);
     }
 
     public static Dictionary<byte[], List<float>> GetTimings() {
