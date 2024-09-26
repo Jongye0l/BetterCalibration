@@ -55,10 +55,8 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                 GUILayout.BeginVertical(new GUIStyle(GUI.skin.box));
                     if(allTimings.Count == 0) {
                         GUILayout.BeginVertical();
-                            foreach(float timing in allTimings) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
                             GUILayout.Label(localization["TimingLogger.NoTimings"]);
                         GUILayout.EndVertical();
-                        GUILayout.FlexibleSpace();
                     } else {
                         GUILayout.BeginHorizontal();
                             GUILayout.BeginVertical();
@@ -86,10 +84,10 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
                 GUILayout.BeginHorizontal();
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(localization["TimingLogger.MapTimings"]);
                     GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
-                    if(inGame) {
                 GUILayout.BeginVertical(new GUIStyle(GUI.skin.box));
                     if(!inGame) {
                         GUILayout.BeginVertical();
