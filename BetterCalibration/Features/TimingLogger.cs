@@ -43,44 +43,67 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
                 GUILayout.BeginHorizontal();
+                    GUILayout.FlexibleSpace();
                     GUILayout.Label(localization["TimingLogger.AllTimings"]);
+                    GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
                 List<float> allTimings = GetTiming([]);
                 bool inGame = ADOBase.controller && ADOBase.controller.gameworld;
                 List<float> mapTimings = !inGame ? null : GetTiming(GetMapHash());
                 GUIContent buttonContent = new(localization["TimingLogger.SetTiming"]);
                 Vector2 buttonSize = GUI.skin.button.CalcSize(buttonContent);
-                float width = 100f;
-                float height = buttonSize.y * Math.Max(allTimings.Count, mapTimings?.Count ?? 1);
-                GUILayout.BeginArea(new Rect(0, 0, width, height), new GUIStyle(GUI.skin.box));
-                    GUILayout.BeginHorizontal();
+                GUILayout.BeginVertical(new GUIStyle(GUI.skin.box));
+                    if(allTimings.Count == 0) {
                         GUILayout.BeginVertical();
                             foreach(float timing in allTimings) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
-                                                                                    : Mathf.RoundToInt(timing).ToString(), GUILayout.Height(buttonSize.y));
+                            GUILayout.Label(localization["TimingLogger.NoTimings"]);
                         GUILayout.EndVertical();
                         GUILayout.FlexibleSpace();
-                        GUILayout.BeginVertical();
-                            foreach(float timing in allTimings.Where(_ => GUILayout.Button(buttonContent))) {
-                                if(FloatOffset.Instance.Enabled) {
-                                    FloatOffset.Instance.Offset = timing;
-                                    continue;
+                    } else {
+                        GUILayout.BeginHorizontal();
+                            GUILayout.BeginVertical();
+                                foreach(float timing in allTimings) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
+                                                                                        : Mathf.RoundToInt(timing).ToString(), GUILayout.Height(buttonSize.y));
+                            GUILayout.EndVertical();
+                            GUILayout.FlexibleSpace();
+                            GUILayout.BeginVertical();
+                                foreach(float timing in allTimings.Where(_ => GUILayout.Button(buttonContent))) {
+                                    if(FloatOffset.Instance.Enabled) {
+                                        FloatOffset.Instance.Offset = timing;
+                                        continue;
+                                    }
+                                    int roundedTiming = Mathf.RoundToInt(timing);
+                                    if(scrConductor.currentPreset.inputOffset == roundedTiming) continue;
+                                    scrConductor.currentPreset.inputOffset = roundedTiming;
+                                    scrConductor.SaveCurrentPreset();
                                 }
                                 int roundedTiming = Mathf.RoundToInt(timing);
-                                if(scrConductor.currentPreset.inputOffset == roundedTiming) continue;
-                                scrConductor.currentPreset.inputOffset = roundedTiming;
-                                scrConductor.SaveCurrentPreset();
-                            }
-                        GUILayout.EndVertical();
-                    GUILayout.EndHorizontal();
-                GUILayout.EndArea();
+                            GUILayout.EndVertical();
+                        GUILayout.EndHorizontal();
+                    }
+                GUILayout.EndVertical();
                 GUILayout.FlexibleSpace();
             GUILayout.EndVertical();
             GUILayout.BeginVertical();
                 GUILayout.BeginHorizontal();
                     GUILayout.Label(localization["TimingLogger.MapTimings"]);
+                    GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
-                GUILayout.BeginArea(new Rect(0, 0, width, height), new GUIStyle(GUI.skin.box));
                     if(inGame) {
+                GUILayout.BeginVertical(new GUIStyle(GUI.skin.box));
+                    if(!inGame) {
+                        GUILayout.BeginVertical();
+                            GUILayout.FlexibleSpace();
+                            GUILayout.Label(localization["TimingLogger.NotOpenMap"]);
+                            GUILayout.FlexibleSpace();
+                        GUILayout.EndVertical();
+                    } else if(mapTimings.Count == 0) {
+                        GUILayout.BeginVertical();
+                            GUILayout.FlexibleSpace();
+                            GUILayout.Label(localization["TimingLogger.NoTimings"]);
+                            GUILayout.FlexibleSpace();
+                        GUILayout.EndVertical();
+                    } else {
                         GUILayout.BeginHorizontal();
                             GUILayout.BeginVertical();
                                 foreach(float timing in allTimings) GUILayout.Label(FloatOffset.Instance.Enabled ? timing.ToString("0.##")
@@ -100,12 +123,8 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                                 }
                             GUILayout.EndVertical();
                         GUILayout.EndHorizontal();
-                    } else {
-                        GUILayout.BeginVertical();
-                            GUILayout.Label(localization["TimingLogger.NotOpenMap"]);
-                        GUILayout.EndVertical();
                     }
-                GUILayout.EndArea();
+                GUILayout.EndVertical();
                 GUILayout.FlexibleSpace();
             GUILayout.EndVertical();
         GUILayout.EndHorizontal();
