@@ -32,7 +32,7 @@ public class CalibrationDetail() : Feature(Main.Instance, nameof(CalibrationDeta
     }
     
     [JAPatch(typeof(scrCalibrationPlanet), "GetOffset", PatchType.Postfix, true)]
-    public static void SetMinMax(ref double __result) {
+    public static void SetMinMax(double __result) {
         float timing = (float) (__result * 1000);
         if(!_text) return;
         if(_max == null || timing > _max) _max = timing;

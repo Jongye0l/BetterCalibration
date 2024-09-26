@@ -62,7 +62,7 @@ public class FloatOffset : Feature {
         GUILayout.EndHorizontal();
     }
 
-    [JAPatch(typeof(scrConductor), "calibration_i.get", PatchType.Prefix, true)]
+    [JAPatch(typeof(scrConductor), "get_calibration_i", PatchType.Prefix, true)]
     private static bool GetCalibration(ref float __result) {
         if(!_settings.Offset.TryGetValue(scrConductor.currentPreset.outputName, out float offset)) return true;
         __result = offset / 1000f;
@@ -71,14 +71,22 @@ public class FloatOffset : Feature {
 
     [JAPatch(typeof(SettingsMenu), "UpdateSetting", PatchType.Prefix, false)]
     private static bool UpdateSetting(SettingsMenu __instance, PauseSettingButton setting, SettingsMenu.Interaction action) {
-        if(setting != __instance.offsetButton || action is SettingsMenu.Interaction.ActivateInfo or SettingsMenu.Interaction.Activate) return true;
-        if(action != SettingsMenu.Interaction.Refresh) {
+        if(setting.name != "inputOffset" || action is SettingsMenu.Interaction.ActivateInfo or SettingsMenu.Interaction.Activate) return true;
+        __instance.offsetButton = setting;
+        if(action == SettingsMenu.Interaction.Refresh) setting.CachedValue = null;
+        else {
             float offset = Instance.Offset;
             float increment = 10;
             if(RDInput.holdingShift) increment /= 10;
             if(RDInput.holdingControl) increment /= 100;
-            if(action == SettingsMenu.Interaction.Increment) offset += increment;
-            else if(action == SettingsMenu.Interaction.Decrement) offset -= increment;
+            if(action == SettingsMenu.Interaction.Increment) {
+                offset += increment;
+                setting.PlayArrowAnimation(true);
+            } else if(action == SettingsMenu.Interaction.Decrement) {
+                offset -= increment;
+                setting.PlayArrowAnimation(false);
+            }
+            scrController.instance.pauseMenu.PlayMenuSfx(SfxSound.MenuSquelch, 1.5f);
             Instance.Offset = offset;
         }
         Instance.SetOffsetSettingString(setting);
@@ -100,7 +108,7 @@ public class FloatOffset : Feature {
                     current = enumerator.Current;
                 } else if(method == typeof(double).Method("ToString", [])) {
                     yield return new CodeInstruction(OpCodes.Ldstr, "0.##");
-                    current.operand = typeof(float).Method("ToString", typeof(string));
+                    current.operand = typeof(double).Method("ToString", typeof(string));
                 }
             } else if(current.opcode == OpCodes.Ldsflda && current.operand is FieldInfo field && field == typeof(scrConductor).Field("currentPreset")) {
                 enumerator.MoveNext();
@@ -122,6 +130,28 @@ public class FloatOffset : Feature {
                     next = enumerator.Current;
                 } while(next.opcode != OpCodes.Call || (MethodInfo) next.operand != typeof(scrConductor).Method("SaveCurrentPreset"));
                 continue;
+            }
+            yield return current;
+        }
+    }
+
+    [JAPatch(typeof(scrCalibrationPlanet), "PutDataPoint", PatchType.Transpiler, false)]
+    private static IEnumerable<CodeInstruction> PutDataPoint(IEnumerable<CodeInstruction> instructions) {
+        using IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
+        while(enumerator.MoveNext()) {
+            CodeInstruction current = enumerator.Current;
+            if(current.opcode == OpCodes.Ldfld && current.operand is FieldInfo field && field == typeof(scrCalibrationPlanet).Field("txtLastOffset")) {
+                while(current.opcode != OpCodes.Call) {
+                    enumerator.MoveNext();
+                    current = enumerator.Current;
+                }
+                do {
+                    enumerator.MoveNext();
+                } while(current.opcode != OpCodes.Call);
+                yield return new CodeInstruction(OpCodes.Ldstr, "0.##");
+                yield return new CodeInstruction(OpCodes.Call, typeof(double).Method("ToString", typeof(string)));
+                enumerator.MoveNext();
+                current = enumerator.Current;
             }
             yield return current;
         }
