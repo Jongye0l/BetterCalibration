@@ -146,7 +146,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     }
 
     private static byte[] GetMapHash() {
-        return ADOBase.isOfficialLevel ? Encoding.UTF8.GetBytes(ADOBase.currentLevel) : GetHash();
+        return MD5.Create().ComputeHash(ADOBase.isOfficialLevel ? Encoding.UTF8.GetBytes(ADOBase.currentLevel) : GetHash());
     }
 
     private static byte[] GetHash() {
@@ -204,8 +204,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                     break;
             }
         }
-        using SHA256 sha256 = SHA256.Create();
-        return sha256.ComputeHash(memoryStream);
+        return memoryStream.ToArray();
     }
 
     public static Dictionary<byte[], List<float>> GetTimings() {
@@ -217,7 +216,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                     using Stream stream = Zipper.UnDeflateToMemoryStream(fileStream);
                     int count = stream.ReadInt();
                     for(int i = 0; i < count; i++) {
-                        byte[] key = stream.ReadBytes(256);
+                        byte[] key = stream.ReadBytes(16);
                         List<float> value = [];
                         int valueCount = stream.ReadInt();
                         for(int j = 0; j < valueCount; j++) value.Add(stream.ReadFloat());
