@@ -100,15 +100,15 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
         string changed;
         _changeOffset = GetTimingAverage();
         if(FloatOffset.Instance.Enabled) {
-            int i = scrConductor.currentPreset.inputOffset;
-            _changeOffset += i;
-            original = i.ToString();
-            changed = Mathf.RoundToInt(_changeOffset).ToString();
-        } else {
             float f = FloatOffset.Instance.Offset;
             _changeOffset += f;
             original = f.ToString("0.##");
             changed = _changeOffset.ToString("0.##");
+        } else {
+            int i = scrConductor.currentPreset.inputOffset;
+            _changeOffset += i;
+            original = i.ToString();
+            changed = Mathf.RoundToInt(_changeOffset).ToString();
         }
         _popupText.text = string.Format(Main.Instance.Localization["Popup.ChangeOffset"], original, changed);
     }
