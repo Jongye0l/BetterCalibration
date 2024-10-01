@@ -176,8 +176,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                 case LevelEventType.SetSpeed:
                     memoryStream.WriteInt(levelEvent.floor);
                     memoryStream.WriteByte(0);
-                    levelEvent.Get<SpeedType>("speedType");
-                    memoryStream.WriteByte((byte) levelEvent["speedType"]);
+                    memoryStream.WriteByte((byte) levelEvent.Get<SpeedType>("speedType"));
                     if((SpeedType) levelEvent["speedType"] == SpeedType.Bpm) memoryStream.WriteFloat((float) levelEvent["beatsPerMinute"]);
                     else memoryStream.WriteFloat((float) levelEvent["bpmMultiplier"]);
                     break;
