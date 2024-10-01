@@ -162,7 +162,8 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     }
 
     private static byte[] GetMapHash() {
-        return MD5.Create().ComputeHash(ADOBase.isOfficialLevel ? Encoding.UTF8.GetBytes(ADOBase.currentLevel) : GetHash());
+        using MD5 md5 = MD5.Create();
+        return md5.ComputeHash(ADOBase.isOfficialLevel ? Encoding.UTF8.GetBytes(ADOBase.currentLevel) : GetHash());
     }
 
     private static byte[] GetHash() {
