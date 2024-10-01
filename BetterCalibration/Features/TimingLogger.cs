@@ -230,6 +230,9 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                 using FileStream fileStream = File.OpenRead(Path.Combine(Main.Instance.Path, "Timings.dat"));
                 try {
                     using Stream stream = Zipper.UnDeflateToMemoryStream(fileStream);
+                    List<float> allTimings = [];
+                    int allCount = stream.ReadInt();
+                    for(int i = 0; i < allCount; i++) allTimings.Add(stream.ReadFloat());
                     int count = stream.ReadInt();
                     for(int i = 0; i < count; i++) {
                         byte[] key = stream.ReadBytes(16);
@@ -275,8 +278,11 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
 
     public static void SaveTiming() {
         using MemoryStream memoryStream = new();
-        memoryStream.WriteInt(_timings.Count);
-        foreach(KeyValuePair<byte[],List<float>> valuePair in _timings) {
+        List<float> allTimings = GetTiming([]);
+        memoryStream.WriteInt(allTimings.Count);
+        foreach(float timing in allTimings) memoryStream.WriteFloat(timing);
+        memoryStream.WriteInt(_timings.Count - 1);
+        foreach(KeyValuePair<byte[], List<float>> valuePair in _timings.Where(valuePair => valuePair.Key.Length != 0)) {
             memoryStream.Write(valuePair.Key);
             memoryStream.WriteInt(valuePair.Value.Count);
             foreach(float timing in valuePair.Value) memoryStream.WriteFloat(timing);
