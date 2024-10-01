@@ -229,16 +229,15 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
             if(File.Exists(Path.Combine(Main.Instance.Path, "Timings.dat"))) {
                 using FileStream fileStream = File.OpenRead(Path.Combine(Main.Instance.Path, "Timings.dat"));
                 try {
-                    using Stream stream = Zipper.UnDeflateToMemoryStream(fileStream);
                     List<float> allTimings = [];
-                    int allCount = stream.ReadInt();
-                    for(int i = 0; i < allCount; i++) allTimings.Add(stream.ReadFloat());
-                    int count = stream.ReadInt();
+                    int allCount = fileStream.ReadInt();
+                    for(int i = 0; i < allCount; i++) allTimings.Add(fileStream.ReadFloat());
+                    int count = fileStream.ReadInt();
                     for(int i = 0; i < count; i++) {
-                        byte[] key = stream.ReadBytes(16);
+                        byte[] key = fileStream.ReadBytes(16);
                         List<float> value = [];
-                        int valueCount = stream.ReadInt();
-                        for(int j = 0; j < valueCount; j++) value.Add(stream.ReadFloat());
+                        int valueCount = fileStream.ReadInt();
+                        for(int j = 0; j < valueCount; j++) value.Add(fileStream.ReadFloat());
                         _timings[key] = value;
                     }
                 } catch (Exception e) {
@@ -277,18 +276,16 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     }
 
     public static void SaveTiming() {
-        using MemoryStream memoryStream = new();
-        List<float> allTimings = GetTiming([]);
-        memoryStream.WriteInt(allTimings.Count);
-        foreach(float timing in allTimings) memoryStream.WriteFloat(timing);
-        memoryStream.WriteInt(_timings.Count - 1);
-        foreach(KeyValuePair<byte[], List<float>> valuePair in _timings.Where(valuePair => valuePair.Key.Length != 0)) {
-            memoryStream.Write(valuePair.Key);
-            memoryStream.WriteInt(valuePair.Value.Count);
-            foreach(float timing in valuePair.Value) memoryStream.WriteFloat(timing);
-        }
         using FileStream fileStream = File.OpenWrite(Path.Combine(Main.Instance.Path, "Timings.dat"));
-        fileStream.Deflate(memoryStream);
+        List<float> allTimings = GetTiming([]);
+        fileStream.WriteInt(allTimings.Count);
+        foreach(float timing in allTimings) fileStream.WriteFloat(timing);
+        fileStream.WriteInt(_timings.Count - 1);
+        foreach(KeyValuePair<byte[], List<float>> valuePair in _timings.Where(valuePair => valuePair.Key.Length != 0)) {
+            fileStream.Write(valuePair.Key);
+            fileStream.WriteInt(valuePair.Value.Count);
+            foreach(float timing in valuePair.Value) fileStream.WriteFloat(timing);
+        }
     }
 
     private class TimingLoggerSettings : JASetting {
