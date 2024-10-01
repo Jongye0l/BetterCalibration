@@ -39,6 +39,24 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         SettingGUI settingGUI = Main.SettingGUI;
         settingGUI.AddSettingInt(ref _settings.MaxTimings, 15, ref _maxTimings, localization["TimingLogger.MaxTimings"]);
         settingGUI.AddSettingInt(ref _settings.MaxTimingsPerMap, 5, ref _maxTimingsPerMap, localization["TimingLogger.MaxTimingsPerMap"]);
+        bool inGame = ADOBase.controller && ADOBase.controller.gameworld;
+        List<float> mapTimings = !inGame ? null : GetTiming(GetMapHash());
+        GUILayout.BeginHorizontal();
+            GUILayout.Label(localization["TimingLogger.PrevOffset"] + ": " +
+                            (inGame ? mapTimings.Count == 0 ? localization["TimingLogger.NoTimings"] : mapTimings[0] + "" :
+                                 localization["TimingLogger.NotOpenMap"]));
+            if(inGame && mapTimings.Count > 0 && GUILayout.Button(localization["TimingLogger.SetTiming"])) {
+                if(FloatOffset.Instance.Enabled) {
+                    FloatOffset.Instance.Offset = mapTimings[0];
+                    return;
+                }
+                if(scrConductor.currentPreset.inputOffset != (int) mapTimings[0]) {
+                    scrConductor.currentPreset.inputOffset = (int) mapTimings[0];
+                    scrConductor.SaveCurrentPreset();
+                }
+            }
+            GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
             GUILayout.BeginVertical();
                 GUILayout.BeginHorizontal();
@@ -47,8 +65,6 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                     GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
                 List<float> allTimings = GetTiming([]);
-                bool inGame = ADOBase.controller && ADOBase.controller.gameworld;
-                List<float> mapTimings = !inGame ? null : GetTiming(GetMapHash());
                 GUIContent buttonContent = new(localization["TimingLogger.SetTiming"]);
                 Vector2 buttonSize = GUI.skin.button.CalcSize(buttonContent);
                 GUILayout.BeginVertical(new GUIStyle(GUI.skin.box));
