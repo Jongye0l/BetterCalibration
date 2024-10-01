@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ADOFAI;
 using BetterCalibration.DoubleFeaturePatch;
+using HarmonyLib;
 using JALib.Core;
 using JALib.Core.Patch;
 using JALib.Core.Setting;
@@ -20,11 +21,12 @@ namespace BetterCalibration.Features;
 
 public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true, typeof(TimingLogger), typeof(TimingLoggerSettings)) {
     private static bool _logging;
-    private static Dictionary<byte[], List<float>> _timings;
+    private static Dictionary<Hash, List<float>> _timings;
     private static long _lastUseTime;
     private static TimingLoggerSettings _settings;
     private string _maxTimings;
     private string _maxTimingsPerMap;
+    private static readonly Hash AllHash = new([]);
 
     protected override void OnEnable() {
         Timing.Instance.AddPatch(this);
@@ -41,6 +43,9 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         settingGUI.AddSettingInt(ref _settings.MaxTimingsPerMap, 5, ref _maxTimingsPerMap, localization["TimingLogger.MaxTimingsPerMap"]);
         bool inGame = ADOBase.controller && ADOBase.controller.gameworld;
         List<float> mapTimings = !inGame ? null : GetTiming(GetMapHash());
+#if DEBUG
+        if(inGame) GUILayout.Label("Hash: " + GetMapHash());
+#endif
         GUILayout.BeginHorizontal();
             GUILayout.Label(localization["TimingLogger.PrevOffset"] + ": " +
                             (inGame ? mapTimings.Count == 0 ? localization["TimingLogger.NoTimings"] : mapTimings[0] + "" :
@@ -64,7 +69,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                     GUILayout.Label(localization["TimingLogger.AllTimings"]);
                     GUILayout.FlexibleSpace();
                 GUILayout.EndHorizontal();
-                List<float> allTimings = GetTiming([]);
+                List<float> allTimings = GetTiming(AllHash);
                 GUIContent buttonContent = new(localization["TimingLogger.SetTiming"]);
                 Vector2 buttonSize = GUI.skin.button.CalcSize(buttonContent);
                 GUILayout.BeginVertical(new GUIStyle(GUI.skin.box));
@@ -154,14 +159,14 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, true)]
     public static void LogTiming() {
         if(_logging || Timing.Timings.Count == 0) return;
-        byte[] mapHash = GetMapHash();
+        Hash mapHash = GetMapHash();
         float timing = scrConductor.currentPreset.inputOffset + Timing.Timings.Average();
         AddTiming(mapHash, timing, _settings.MaxTimingsPerMap);
-        AddTiming([], timing, _settings.MaxTimings);
+        AddTiming(AllHash, timing, _settings.MaxTimings);
         _logging = true;
     }
 
-    private static byte[] GetMapHash() {
+    private static Hash GetMapHash() {
         using MD5 md5 = MD5.Create();
         return md5.ComputeHash(ADOBase.isOfficialLevel ? Encoding.UTF8.GetBytes(ADOBase.currentLevel) : GetHash());
     }
@@ -223,9 +228,9 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         return memoryStream.ToArray();
     }
 
-    public static Dictionary<byte[], List<float>> GetTimings() {
+    public static Dictionary<Hash, List<float>> GetTimings() {
         if(_timings == null) {
-            _timings = new Dictionary<byte[], List<float>>();
+            _timings = new Dictionary<Hash, List<float>>();
             if(File.Exists(Path.Combine(Main.Instance.Path, "Timings.dat"))) {
                 using FileStream fileStream = File.OpenRead(Path.Combine(Main.Instance.Path, "Timings.dat"));
                 try {
@@ -261,7 +266,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         _timings = null;
     }
 
-    public static void AddTiming(byte[] mapHash, float timing, int maxTiming) {
+    public static void AddTiming(Hash mapHash, float timing, int maxTiming) {
         _timings = GetTimings();
         List<float> timings;
         if(!_timings.TryGetValue(mapHash, out List<float> timing1)) timings = _timings[mapHash] = [0f];
@@ -271,18 +276,18 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         SaveTiming();
     }
 
-    public static List<float> GetTiming(byte[] mapHash) {
+    public static List<float> GetTiming(Hash mapHash) {
         return GetTimings().TryGetValue(mapHash, out List<float> timing) ? timing : [0f];
     }
 
     public static void SaveTiming() {
         using FileStream fileStream = File.OpenWrite(Path.Combine(Main.Instance.Path, "Timings.dat"));
-        List<float> allTimings = GetTiming([]);
+        List<float> allTimings = GetTiming(AllHash);
         fileStream.WriteInt(allTimings.Count);
         foreach(float timing in allTimings) fileStream.WriteFloat(timing);
         fileStream.WriteInt(_timings.Count - 1);
-        foreach(KeyValuePair<byte[], List<float>> valuePair in _timings.Where(valuePair => valuePair.Key.Length != 0)) {
-            fileStream.Write(valuePair.Key);
+        foreach(KeyValuePair<Hash, List<float>> valuePair in _timings.Where(valuePair => valuePair.Key != AllHash)) {
+            fileStream.Write(valuePair.Key.data);
             fileStream.WriteInt(valuePair.Value.Count);
             foreach(float timing in valuePair.Value) fileStream.WriteFloat(timing);
         }
@@ -295,5 +300,25 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         public TimingLoggerSettings(JAMod mod, JObject jsonObject = null) : base(mod, jsonObject) {
             _settings = this;
         }
+    }
+
+    public readonly struct Hash(byte[] data) : IEquatable<Hash> {
+        public readonly byte[] data = data;
+
+        public override bool Equals(object obj) => obj is Hash hash ? Equals(hash) : obj is byte[] bytes && Equals(bytes);
+        public bool Equals(Hash other) => Equals(other.data);
+        public bool Equals(byte[] hash) {
+            if(data.Length != hash.Length) return false;
+            return data.Length == hash.Length && !data.Where((t, i) => t != hash[i]).Any();
+        }
+        public override int GetHashCode() => data != null ? ToString().GetHashCode() : 0;
+
+        public static bool operator ==(Hash left, Hash right) => left.Equals(right);
+        public static bool operator !=(Hash left, Hash right) => !(left == right);
+
+        public static implicit operator Hash(byte[] hash) => new(hash);
+        public static implicit operator byte[](Hash hash) => hash.data;
+
+        public override string ToString() => data.Join(b => b.ToString("x2"), "");
     }
 }
