@@ -237,9 +237,10 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                     List<float> allTimings = [];
                     int allCount = fileStream.ReadInt();
                     for(int i = 0; i < allCount; i++) allTimings.Add(fileStream.ReadFloat());
+                    _timings[AllHash] = allTimings;
                     int count = fileStream.ReadInt();
                     for(int i = 0; i < count; i++) {
-                        byte[] key = fileStream.ReadBytes(16);
+                        Hash key = fileStream.ReadBytes(16);
                         List<float> value = [];
                         int valueCount = fileStream.ReadInt();
                         for(int j = 0; j < valueCount; j++) value.Add(fileStream.ReadFloat());
