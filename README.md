@@ -19,8 +19,11 @@
 * 보정 팝업
   * 게임을 플레이하다 죽을 시 보정값을 조절할지 물어보는 팝업을 띄웁니다.
 ---
+### 안내 사항 Instructions
+* 이 모드를 사용하려면 [JALib](https://github.com/Jongye0l/JALib/releases)모드가 필요합니다.
+---
 ### 사용 방법 How to use
-* [이 링크](https://github.com/Jongye0l/BetterCalibration/releases/latest) 에서 다운로드 후 모드매니저를 통해 적용시키면 됩니다.
+* JALib 모드를 받은 후 [이 링크](https://github.com/Jongye0l/BetterCalibration/releases/latest) 에서 다운로드 하여 모드매니저를 통해 적용시키면 됩니다.
 ---
 ### 개발 환경 Development environment
 * Windows 11
