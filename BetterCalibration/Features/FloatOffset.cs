@@ -20,8 +20,9 @@ public class FloatOffset : Feature {
     public float Offset {
         get => _settings.Offset.TryGetValue(scrConductor.currentPreset.outputName, out float offset) ? offset : scrConductor.currentPreset.inputOffset;
         set {
-            if(scrConductor.currentPreset.inputOffset != (int) value) {
-                scrConductor.currentPreset.inputOffset = (int) value;
+            int cur = Mathf.RoundToInt(value);
+            if(scrConductor.currentPreset.inputOffset != cur) {
+                scrConductor.currentPreset.inputOffset = cur;
                 scrConductor.SaveCurrentPreset();
             }
             if(_settings.Offset.TryGetValue(scrConductor.currentPreset.outputName, out float f) && f == value) return;
