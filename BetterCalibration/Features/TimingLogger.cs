@@ -234,17 +234,11 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
             if(File.Exists(Path.Combine(Main.Instance.Path, "Timings.dat"))) {
                 using FileStream fileStream = File.OpenRead(Path.Combine(Main.Instance.Path, "Timings.dat"));
                 try {
-                    List<float> allTimings = [];
-                    int allCount = fileStream.ReadInt();
-                    for(int i = 0; i < allCount; i++) allTimings.Add(fileStream.ReadFloat());
-                    _timings[AllHash] = allTimings;
+                    _timings[AllHash] = fileStream.ReadObject<List<float>>();
                     int count = fileStream.ReadInt();
                     for(int i = 0; i < count; i++) {
                         Hash key = fileStream.ReadBytes(16);
-                        List<float> value = [];
-                        int valueCount = fileStream.ReadInt();
-                        for(int j = 0; j < valueCount; j++) value.Add(fileStream.ReadFloat());
-                        _timings[key] = value;
+                        _timings[key] = fileStream.ReadObject<List<float>>();
                     }
                 } catch (Exception e) {
                     Main.Instance.LogException(e);
@@ -283,14 +277,11 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
 
     public static void SaveTiming() {
         using FileStream fileStream = File.OpenWrite(Path.Combine(Main.Instance.Path, "Timings.dat"));
-        List<float> allTimings = GetTiming(AllHash);
-        fileStream.WriteInt(allTimings.Count);
-        foreach(float timing in allTimings) fileStream.WriteFloat(timing);
+        fileStream.WriteObject(GetTiming(AllHash));
         fileStream.WriteInt(_timings.Count - 1);
         foreach(KeyValuePair<Hash, List<float>> valuePair in _timings.Where(valuePair => valuePair.Key != AllHash)) {
             fileStream.Write(valuePair.Key.data);
-            fileStream.WriteInt(valuePair.Value.Count);
-            foreach(float timing in valuePair.Value) fileStream.WriteFloat(timing);
+            fileStream.WriteObject(valuePair.Value);
         }
     }
 
