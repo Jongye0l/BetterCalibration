@@ -247,7 +247,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                     }
                 } catch (Exception e) {
                     Main.Instance.LogException(e);
-                    SaveTiming();
+                    _timings = new Dictionary<Hash, List<float>>();
                 }
             }
             Deleter();
