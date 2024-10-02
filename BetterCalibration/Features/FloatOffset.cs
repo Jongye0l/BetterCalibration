@@ -103,12 +103,11 @@ public class FloatOffset : Feature {
         while(enumerator.MoveNext()) {
             CodeInstruction current = enumerator.Current;
             if(current.opcode == OpCodes.Call && current.operand is MethodInfo method) {
-                if(method == typeof(Math).Method("Round", typeof(double))) {
-                    enumerator.MoveNext();
-                    current = enumerator.Current;
-                } else if(method == typeof(double).Method("ToString", [])) {
+                if(method == typeof(Math).Method("Round", typeof(double))) continue;
+                if(method == typeof(double).Method("ToString", [])) {
                     yield return new CodeInstruction(OpCodes.Ldstr, "0.##");
-                    current.operand = typeof(double).Method("ToString", typeof(string));
+                    yield return new CodeInstruction(OpCodes.Call, typeof(double).Method("ToString", typeof(string)));
+                    continue;
                 }
             } else if(current.opcode == OpCodes.Ldsflda && current.operand is FieldInfo field && field == typeof(scrConductor).Field("currentPreset")) {
                 enumerator.MoveNext();
@@ -118,17 +117,15 @@ public class FloatOffset : Feature {
                     yield return next;
                     continue;
                 }
-                yield return new CodeInstruction(OpCodes.Ldsflda, typeof(FloatOffset).Field("Instance"));
+                yield return new CodeInstruction(OpCodes.Ldsfld, typeof(FloatOffset).Field("Instance"));
                 while(next.opcode != OpCodes.Call) {
                     yield return next;
                     enumerator.MoveNext();
                     next = enumerator.Current;
                 }
-                yield return new CodeInstruction(OpCodes.Call, typeof(FloatOffset).Setter("Offset"));
-                do {
-                    enumerator.MoveNext();
-                    next = enumerator.Current;
-                } while(next.opcode != OpCodes.Call || (MethodInfo) next.operand != typeof(scrConductor).Method("SaveCurrentPreset"));
+                yield return new CodeInstruction(OpCodes.Callvirt, typeof(FloatOffset).Setter("Offset"));
+                enumerator.MoveNext();
+                enumerator.MoveNext();
                 continue;
             }
             yield return current;
@@ -140,18 +137,13 @@ public class FloatOffset : Feature {
         using IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
         while(enumerator.MoveNext()) {
             CodeInstruction current = enumerator.Current;
-            if(current.opcode == OpCodes.Ldfld && current.operand is FieldInfo field && field == typeof(scrCalibrationPlanet).Field("txtLastOffset")) {
-                while(current.opcode != OpCodes.Call) {
-                    enumerator.MoveNext();
-                    current = enumerator.Current;
+            if(current.opcode == OpCodes.Call && current.operand is MethodInfo method) {
+                if(method == typeof(Math).Method("Round", typeof(double))) continue;
+                if(method == typeof(double).Method("ToString", [])) {
+                    yield return new CodeInstruction(OpCodes.Ldstr, "0.##");
+                    yield return new CodeInstruction(OpCodes.Call, typeof(double).Method("ToString", typeof(string)));
+                    continue;
                 }
-                do {
-                    enumerator.MoveNext();
-                } while(current.opcode != OpCodes.Call);
-                yield return new CodeInstruction(OpCodes.Ldstr, "0.##");
-                yield return new CodeInstruction(OpCodes.Call, typeof(double).Method("ToString", typeof(string)));
-                enumerator.MoveNext();
-                current = enumerator.Current;
             }
             yield return current;
         }
