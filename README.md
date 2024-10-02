@@ -35,12 +35,13 @@
 ---
 ### 개발 환경 Development environment
 * Windows 11
-* Rider 2024.1.6
-* .NET Framework 4.8
-* A Dance of Fire and Ice 2.7.0(r122, 91dde9a)
+* Rider 2024.2.5
+* .NET Framework 4.8.1
+* C# 13
+* A Dance of Fire and Ice 2.8.1(r123, 0a4e966)
 ---
 ### 테스트 환경 Test environment
 * Windows 11
-* A Dance of Fire and Ice 2.7.0(r122, 91dde9a)
+* A Dance of Fire and Ice 2.8.1(r123, 0a4e966)
 ---
 # [Join My Discord!](https://discord.jongyeol.kr)
