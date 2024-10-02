@@ -63,12 +63,8 @@ public class FloatOffset : Feature {
         GUILayout.EndHorizontal();
     }
 
-    [JAPatch(typeof(scrConductor), "get_calibration_i", PatchType.Prefix, true)]
-    private static bool GetCalibration(ref float __result) {
-        if(!_settings.Offset.TryGetValue(scrConductor.currentPreset.outputName, out float offset)) return true;
-        __result = offset / 1000f;
-        return false;
-    }
+    [JAPatch(typeof(scrConductor), "get_calibration_i", PatchType.Replace, true)]
+    private static float GetCalibration() => Instance.Offset / 1000f;
 
     [JAPatch(typeof(SettingsMenu), "UpdateSetting", PatchType.Prefix, false)]
     private static bool UpdateSetting(SettingsMenu __instance, PauseSettingButton setting, SettingsMenu.Interaction action) {
