@@ -197,7 +197,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                 case LevelEventType.MultiPlanet:
                     memoryStream.WriteInt(levelEvent.floor);
                     memoryStream.WriteByte(3);
-                    memoryStream.WriteByte((byte) levelEvent["planets"]);
+                    memoryStream.WriteByte((byte) levelEvent.Get<PlanetCount>("planets"));
                     break;
                 case LevelEventType.Pause:
                     memoryStream.WriteInt(levelEvent.floor);
