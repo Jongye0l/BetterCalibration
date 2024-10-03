@@ -47,10 +47,11 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
         if(inGame) GUILayout.Label("Hash: " + GetMapHash());
 #endif
         GUILayout.BeginHorizontal();
+            bool curMapOffset = inGame && mapTimings.Count > 0 && mapTimings[0] != 0;
             GUILayout.Label(localization["TimingLogger.PrevOffset"] + ": " +
-                            (inGame ? mapTimings.Count == 0 ? localization["TimingLogger.NoTimings"] : mapTimings[0] + "" :
+                            (inGame ? !curMapOffset ? localization["TimingLogger.NoTimings"] : mapTimings[0] + "" :
                                  localization["TimingLogger.NotOpenMap"]));
-            if(inGame && mapTimings.Count > 0 && GUILayout.Button(localization["TimingLogger.SetTiming"])) {
+            if(curMapOffset && GUILayout.Button(localization["TimingLogger.SetTiming"])) {
                 if(FloatOffset.Instance.Enabled) {
                     FloatOffset.Instance.Offset = mapTimings[0];
                     return;
