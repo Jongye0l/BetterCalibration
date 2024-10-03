@@ -38,6 +38,7 @@ public class Timing : DoubleFeaturePatch {
 
     [JAPatch(typeof(scrMisc), "GetHitMargin", PatchType.Postfix, true)]
     public static void GetTiming(float hitangle, float refangle, bool isCW, float bpmTimesSpeed, float conductorPitch, HitMargin __result) {
+        if(RDC.auto || scrController.instance.currFloor.nextfloor?.auto == true) return;
         float angle = (hitangle - refangle) * (isCW ? 1 : -1) * 57.29578f;
         float timing = angle / 180 / bpmTimesSpeed / conductorPitch * 60000;
         switch(__result) {
