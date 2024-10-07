@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterCalibration", "BetterCalibration\BetterCalibration.csproj", "{163CFC91-03A4-47CF-80D5-DD92D3140F60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bootstrap", "Bootstrap\Bootstrap.csproj", "{401E0539-1D8D-4A60-9E5E-318ED10E4381}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,9 +12,5 @@ Global
 		{163CFC91-03A4-47CF-80D5-DD92D3140F60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{163CFC91-03A4-47CF-80D5-DD92D3140F60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{163CFC91-03A4-47CF-80D5-DD92D3140F60}.Release|Any CPU.Build.0 = Release|Any CPU
-		{401E0539-1D8D-4A60-9E5E-318ED10E4381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{401E0539-1D8D-4A60-9E5E-318ED10E4381}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{401E0539-1D8D-4A60-9E5E-318ED10E4381}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{401E0539-1D8D-4A60-9E5E-318ED10E4381}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
