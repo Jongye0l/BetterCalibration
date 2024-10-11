@@ -232,24 +232,40 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     public static Dictionary<Hash, List<float>> GetTimings() {
         if(_timings == null) {
             _timings = new Dictionary<Hash, List<float>>();
-            if(File.Exists(Path.Combine(Main.Instance.Path, "Timings.dat"))) {
-                using FileStream fileStream = File.OpenRead(Path.Combine(Main.Instance.Path, "Timings.dat"));
+            string path = Path.Combine(Main.Instance.Path, "Timings.dat");
+            if(File.Exists(path)) {
                 try {
-                    _timings[AllHash] = fileStream.ReadObject<List<float>>();
-                    int count = fileStream.ReadInt();
-                    for(int i = 0; i < count; i++) {
-                        Hash key = fileStream.ReadBytes(16);
-                        _timings[key] = fileStream.ReadObject<List<float>>();
-                    }
+                    GetTimings(path);
+                    goto WorkEnd;
                 } catch (Exception e) {
-                    Main.Instance.LogException(e);
-                    _timings = new Dictionary<Hash, List<float>>();
+                    Main.Instance.LogException("Failed to load timings", e);
                 }
             }
+            path += ".bak";
+            if(File.Exists(path)) {
+                try {
+                    GetTimings(path);
+                    goto WorkEnd;
+                } catch (Exception e) {
+                    Main.Instance.LogException("Failed to load backup timings", e);
+                }
+            }
+            _timings = new Dictionary<Hash, List<float>>();
+WorkEnd:
             Deleter();
         }
         _lastUseTime = DateTime.Now.Ticks;
         return _timings;
+    }
+
+    private static void GetTimings(string path) {
+        using FileStream fileStream = File.OpenRead(Path.Combine(Main.Instance.Path, "Timings.dat"));
+        _timings[AllHash] = fileStream.ReadObject<List<float>>();
+        int count = fileStream.ReadInt();
+        for(int i = 0; i < count; i++) {
+            Hash key = fileStream.ReadBytes(16);
+            _timings[key] = fileStream.ReadObject<List<float>>();
+        }
     }
 
     private static async void Deleter() {
@@ -277,7 +293,9 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     }
 
     public static void SaveTiming() {
-        using FileStream fileStream = File.OpenWrite(Path.Combine(Main.Instance.Path, "Timings.dat"));
+        string path = Path.Combine(Main.Instance.Path, "Timings.dat");
+        if(File.Exists(path)) File.Copy(path, path + ".bak", true);
+        using FileStream fileStream = File.OpenWrite(path);
         fileStream.WriteObject(GetTiming(AllHash));
         fileStream.WriteInt(_timings.Count - 1);
         foreach(KeyValuePair<Hash, List<float>> valuePair in _timings.Where(valuePair => valuePair.Key != AllHash)) {
