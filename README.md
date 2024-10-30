@@ -1,5 +1,5 @@
 # BetterCalibration
-![C#](https://img.shields.io/badge/Lang-Csharp-c9c8e4.svg?&logo=csharp)
+![C#](https://img.shields.io/badge/Lang-Csharp-c9c8e4.svg?&logo=c#)
 ![Rider](https://img.shields.io/badge/IDE-Rider-c9c8e4.svg?&logo=rider)
 ![Download](https://img.shields.io/github/downloads/Jongye0l/BetterCalibration/BetterCalibration.zip)
 
@@ -35,7 +35,7 @@
 ---
 ### 개발 환경 Development environment
 * Windows 11
-* Rider 2024.2.5
+* Rider 2024.2.7
 * .NET Framework 4.8.1
 * C# 13
 * A Dance of Fire and Ice 2.8.1(r123, 0a4e966)
