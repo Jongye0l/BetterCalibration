@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
-using HarmonyLib;
 using JALib.Core;
 using JALib.Core.Patch;
 using JALib.Core.Setting;
@@ -10,6 +9,7 @@ using JALib.Tools;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using MethodInfo = System.Reflection.MethodInfo;
+using CodeInstruction = HarmonyLib.CodeInstruction;
 
 namespace BetterCalibration.Features;
 
