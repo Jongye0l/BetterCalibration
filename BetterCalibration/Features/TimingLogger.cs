@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -182,9 +182,9 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                 case LevelEventType.SetSpeed:
                     memoryStream.WriteInt(levelEvent.floor);
                     memoryStream.WriteByte(0);
-                    memoryStream.WriteByte((byte) levelEvent.Get<SpeedType>("speedType"));
-                    if((SpeedType) levelEvent["speedType"] == SpeedType.Bpm) memoryStream.WriteFloat((float) levelEvent["beatsPerMinute"]);
-                    else memoryStream.WriteFloat((float) levelEvent["bpmMultiplier"]);
+                    memoryStream.WriteByte((byte) (SpeedType) levelEvent["speedType"]);
+                    // ReSharper disable once PossibleInvalidCastException
+                    memoryStream.WriteFloat((float) levelEvent[(SpeedType) levelEvent["speedType"] == SpeedType.Bpm ? "beatsPerMinute" : "bpmMultiplier"]);
                     break;
                 case LevelEventType.Twirl:
                     memoryStream.WriteInt(levelEvent.floor);
@@ -198,7 +198,7 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
                 case LevelEventType.MultiPlanet:
                     memoryStream.WriteInt(levelEvent.floor);
                     memoryStream.WriteByte(3);
-                    memoryStream.WriteByte((byte) levelEvent.Get<PlanetCount>("planets"));
+                    memoryStream.WriteByte((byte) (PlanetCount) levelEvent["planets"]);
                     break;
                 case LevelEventType.Pause:
                     memoryStream.WriteInt(levelEvent.floor);
