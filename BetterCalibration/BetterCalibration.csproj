@@ -17,7 +17,7 @@
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
         <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
+        <DebugType>portable</DebugType>
         <Optimize>false</Optimize>
         <OutputPath>bin\Debug\</OutputPath>
         <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -26,7 +26,8 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>portable</DebugType>
         <Optimize>true</Optimize>
         <OutputPath>bin\Release\</OutputPath>
         <DefineConstants>TRACE</DefineConstants>
@@ -519,7 +520,8 @@
     -->
 
     <Target Name="AfterBuild">
-        <Copy SourceFiles="bin/Debug/BetterCalibration.dll" DestinationFolder="D:\SteamLibrary\steamapps\common\A Dance of Fire and Ice\Mods\BetterCalibration"/>
+        <Copy SourceFiles="$(OutputPath)BetterCalibration.dll" DestinationFolder="D:\SteamLibrary\steamapps\common\A Dance of Fire and Ice\Mods\BetterCalibration"/>
+        <Copy SourceFiles="$(OutputPath)BetterCalibration.pdb" DestinationFolder="D:\SteamLibrary\steamapps\common\A Dance of Fire and Ice\Mods\BetterCalibration"/>
         <Copy SourceFiles="bin/Release/BetterCalibration.dll" DestinationFolder="D:\ModRelease/BetterCalibration"/>
     </Target>
 
