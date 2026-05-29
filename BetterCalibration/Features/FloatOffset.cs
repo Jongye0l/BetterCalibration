@@ -70,8 +70,10 @@ public class FloatOffset : Feature {
     private static bool UpdateSetting(ref PauseSettingButton ___offsetButton, PauseSettingButton setting, SettingsMenu.Interaction action) {
         if(setting.name != "inputOffset" || action is SettingsMenu.Interaction.ActivateInfo or SettingsMenu.Interaction.Activate) return true;
         ___offsetButton = setting;
-        if(action == SettingsMenu.Interaction.Refresh) setting.CachedValue = null;
-        else {
+        if(action == SettingsMenu.Interaction.Refresh) {
+            setting.CachedValue = null;
+            setting.initialValue = Instance.Offset;
+        } else {
             float offset = Instance.Offset;
             float increment = 10;
             if(RDInput.holdingShift) increment /= 10;
