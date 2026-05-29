@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using BetterCalibration.Features;
 using JALib.Core;
 using JALib.Core.Patch;
@@ -11,22 +11,18 @@ namespace BetterCalibration;
 public class Main : JAMod {
     public static Main Instance;
     public static SettingGUI SettingGUI;
-    public static string offsetString;
-    private static JAPatcher Patcher;
+    public static string OffsetString;
 
-    private Main(UnityModManager.ModEntry modEntry) : base(modEntry, true, gid: 1929334982) {
-        Instance = this;
+    protected override void OnSetup() {
         SettingGUI = new SettingGUI(this);
         AddFeature(new CalibrationPopup(), new CalibrationDetail(), new CalibrationSong(), new TimingLogger(), new FloatOffset());
-        Patcher = new JAPatcher(this).AddPatch(ShowSettingsMenu);
+        Patcher.AddPatch(ShowSettingsMenu);
     }
 
     protected override void OnEnable() {
-        Patcher.Patch();
     }
 
     protected override void OnDisable() {
-        Patcher.Unpatch();
     }
 
     protected override void OnGUI() {
@@ -52,11 +48,11 @@ public class Main : JAMod {
             scrConductor.SaveCurrentPreset();
         }
         int offset = scrConductor.currentPreset.inputOffset;
-        if(offsetString.IsNullOrEmpty() || !int.TryParse(offsetString, out int i) || i != offset) offsetString = offset.ToString();
-        offsetString = GUILayout.TextField(offsetString);
+        if(OffsetString.IsNullOrEmpty() || !int.TryParse(OffsetString, out int i) || i != offset) OffsetString = offset.ToString();
+        OffsetString = GUILayout.TextField(OffsetString);
         int resultInt;
         try {
-            resultInt = offsetString.IsNullOrEmpty() ? offset : int.TryParse(offsetString, out i) ? i : offset;
+            resultInt = OffsetString.IsNullOrEmpty() ? offset : int.TryParse(OffsetString, out i) ? i : offset;
         } catch (FormatException) {
             resultInt = offset;
         }
@@ -73,7 +69,7 @@ public class Main : JAMod {
         GUILayout.EndHorizontal();
     }
 
-    protected override void OnHideGUI() => offsetString = null;
+    protected override void OnHideGUI() => OffsetString = null;
 
     private void AddLanguageButton(string text, SystemLanguage? lang) {
         if(!GUILayout.Button(GetSelectText(text, CustomLanguage == lang))) return;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -42,7 +42,7 @@ public class FloatOffset : Feature {
     }
 
     protected override void OnGUI() {
-        ref string offsetString = ref Main.offsetString;
+        ref string offsetString = ref Main.OffsetString;
         GUILayout.BeginHorizontal();
         GUILayout.Label(Main.Instance.Localization["InputOffset"]);
         GUILayout.Space(4f);
