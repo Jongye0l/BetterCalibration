@@ -66,7 +66,7 @@ public class FloatOffset : Feature {
     [JAPatch(typeof(scrConductor), "get_calibration_i", PatchType.Replace, true)]
     private static float GetCalibration() => Instance.Offset / 1000f;
 
-    [JAPatch(typeof(SettingsMenu), "UpdateSetting", PatchType.Prefix, false)]
+    [JAPatch(typeof(SettingsMenu), nameof(SettingsMenu.UpdateSetting), PatchType.Prefix, false)]
     private static bool UpdateSetting(ref PauseSettingButton ___offsetButton, PauseSettingButton setting, SettingsMenu.Interaction action) {
         if(setting.name != "inputOffset" || action is SettingsMenu.Interaction.ActivateInfo or SettingsMenu.Interaction.Activate) return true;
         ___offsetButton = setting;
@@ -91,9 +91,9 @@ public class FloatOffset : Feature {
     }
 
     public void SetOffsetSettingString(PauseSettingButton setting) {
-        setting.valueLabel.text = Offset.ToString("0.##") + RDString.Get("editor.unit." + setting.unit);
+        setting.valueLabel.text = Offset.ToString("0.##") + Main.RdStringGet("editor.unit." + setting.unit);
     }
-    
+
     [JAPatch("scrCalibrationPlanet", "PostSong", PatchType.Transpiler, false, MaxVersion = 140)]
     [JAPatch(nameof(scnCalibration), "Calibrated", PatchType.Transpiler, false, MinVersion = 141)]
     private static IEnumerable<CodeInstruction> PostSong(IEnumerable<CodeInstruction> instructions) {

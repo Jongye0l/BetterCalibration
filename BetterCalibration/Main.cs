@@ -3,6 +3,7 @@ using BetterCalibration.Features;
 using JALib.Core;
 using JALib.Core.Patch;
 using JALib.Tools;
+using SA.GoogleDoc;
 using UnityEngine;
 using UnityModManagerNet;
 
@@ -84,6 +85,12 @@ public class Main : JAMod {
     private static void ShowSettingsMenu(PauseSettingButton ___offsetButton) {
         if(!___offsetButton) return;
         if(FloatOffset.Instance.Enabled) FloatOffset.Instance.SetOffsetSettingString(___offsetButton);
-        else ___offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + ___offsetButton.unit);
+        else ___offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset + RdStringGet("editor.unit." + ___offsetButton.unit);
     }
+
+    public static string RdStringGet(string key) {
+        return VersionControl.releaseNumber < 141 ? typeof(RDString).Invoke<string>("Get", key, null, LangSection.Translations) : RdStringGetR141(key);
+    }
+
+    private static string RdStringGetR141(string key) => RDString.Get(key);
 }
