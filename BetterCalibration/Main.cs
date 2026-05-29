@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using BetterCalibration.Features;
 using JALib.Core;
 using JALib.Core.Patch;
@@ -77,14 +77,13 @@ public class Main : JAMod {
     }
 
     private static string GetSelectText(string text, bool selected) {
-        return string.Format(selected ? "<b>{0}</b>" : "{0}", text);
+        return selected ? $"<b>{text}</b>" : text;
     }
 
-    [JAPatch(typeof(PauseMenu), "ShowSettingsMenu", PatchType.Prefix, true)]
-    private static void ShowSettingsMenu(PauseMenu __instance) {
-        PauseSettingButton offset = __instance.settingsMenu.offsetButton;
-        if(!offset) return;
-        if(FloatOffset.Instance.Enabled) FloatOffset.Instance.SetOffsetSettingString(offset);
-        else offset.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + offset.unit);
+    [JAPatch(typeof(SettingsMenu), nameof(SettingsMenu.Show), PatchType.Prefix, true)]
+    private static void ShowSettingsMenu(PauseSettingButton ___offsetButton) {
+        if(!___offsetButton) return;
+        if(FloatOffset.Instance.Enabled) FloatOffset.Instance.SetOffsetSettingString(___offsetButton);
+        else ___offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset + RDString.Get("editor.unit." + ___offsetButton.unit);
     }
 }

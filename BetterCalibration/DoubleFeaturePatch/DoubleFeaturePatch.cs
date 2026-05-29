@@ -5,22 +5,21 @@ using JALib.Core.Patch;
 namespace BetterCalibration.DoubleFeaturePatch;
 
 public abstract class DoubleFeaturePatch {
-
-    protected List<Feature> features = [];
-    protected JAPatcher patcher;
-    public bool patched;
+    protected List<Feature> Features = [];
+    protected JAPatcher Patcher;
+    public bool Patched;
 
     public void AddPatch(Feature feature) {
-        if(features.Count == 0) {
+        if(Features.Count == 0) {
             OnEnable();
             Patch();
         }
-        features.Add(feature);
+        Features.Add(feature);
     }
 
     public void RemovePatch(Feature feature) {
-        features.Remove(feature);
-        if(features.Count == 0) {
+        Features.Remove(feature);
+        if(Features.Count == 0) {
             Unpatch();
             OnDisable();
         }
@@ -33,18 +32,18 @@ public abstract class DoubleFeaturePatch {
     }
 
     private void Patch() {
-        if(patched) return;
-        if(patcher == null) {
-            patcher = new JAPatcher(Main.Instance);
-            patcher.AddPatch(GetType());
+        if(Patched) return;
+        if(Patcher == null) {
+            Patcher = new JAPatcher(Main.Instance);
+            Patcher.AddPatch(GetType());
         }
-        patcher.Patch();
-        patched = true;
+        Patcher.Patch();
+        Patched = true;
     }
 
     private void Unpatch() {
-        if(!patched) return;
-        patcher.Unpatch();
-        patched = false;
+        if(!Patched) return;
+        Patcher.Unpatch();
+        Patched = false;
     }
 }

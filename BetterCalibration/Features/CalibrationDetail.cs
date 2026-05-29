@@ -8,7 +8,6 @@ using UnityEngine.UI;
 namespace BetterCalibration.Features;
 
 public class CalibrationDetail() : Feature(Main.Instance, nameof(CalibrationDetail), true, typeof(CalibrationDetail)) {
-    
     private static Text _text;
     private static List<double> _timings;
     private static float? _max;
@@ -25,13 +24,15 @@ public class CalibrationDetail() : Feature(Main.Instance, nameof(CalibrationDeta
         _min = null;
     }
     
-    [JAPatch(typeof(scrCalibrationPlanet), "Start", PatchType.Postfix, true)]
-    public static void Initialize(scrCalibrationPlanet __instance) {
-        _text = __instance.txtResults;
-        _timings = __instance.listOffsets;
+    [JAPatch("scrCalibrationPlanet", "Start", PatchType.Postfix, true, MaxVersion = 140)]
+    [JAPatch(nameof(scnCalibration), "Start", PatchType.Postfix, true, MinVersion = 141)]
+    public static void Initialize(Text ___txtResults, List<double> ___listOffsets) {
+        _text = ___txtResults;
+        _timings = ___listOffsets;
     }
     
-    [JAPatch(typeof(scrCalibrationPlanet), "GetOffset", PatchType.Postfix, true)]
+    [JAPatch("scrCalibrationPlanet", "GetOffset", PatchType.Postfix, false, MaxVersion = 140)]
+    [JAPatch(nameof(scnCalibration), "GetOffset", PatchType.Postfix, false, MinVersion = 141)]
     public static void SetMinMax(double __result) {
         float timing = (float) (__result * 1000);
         if(!_text) return;
@@ -39,12 +40,14 @@ public class CalibrationDetail() : Feature(Main.Instance, nameof(CalibrationDeta
         if(_min == null || timing < _min) _min = timing;
     }
 
-    [JAPatch(typeof(scrCalibrationPlanet), "PutDataPoint", PatchType.Postfix, true)]
+    [JAPatch("scrCalibrationPlanet", "PutDataPoint", PatchType.Postfix, false, MaxVersion = 140)]
+    [JAPatch(nameof(scnCalibration), "PutDataPoint", PatchType.Postfix, false, MinVersion = 141)]
     public static void ReloadText() {
         if(_text) _text.text = string.Format(Main.Instance.Localization.Get("Cablibration.Detail"), ToStringAuto(GetTimingAverage()), ToStringAuto(_max ?? 0), ToStringAuto(_min ?? 0));
     }
 
-    [JAPatch(typeof(scrCalibrationPlanet), "SetMessageNumber", PatchType.Postfix, true)]
+    [JAPatch("scrCalibrationPlanet", "SetMessageNumber", PatchType.Postfix, false, MaxVersion = 140)]
+    [JAPatch(nameof(scnCalibration), "SetMessageNumber", PatchType.Postfix, false, MinVersion = 141)]
     public static void Setup(int n) {
         if(!_text) return;
         _text.fontSize = n == 1 ? 30 : 40;

@@ -30,13 +30,13 @@ public class Timing : DoubleFeaturePatch {
         if((States) newState == States.Start) Timings.Clear();
     }
 
-    [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, true)]
+    [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, false)]
     public static void ExitPlay() {
         _lastTooEarly = null;
         _lastTooLate = null;
     }
 
-    [JAPatch(typeof(scrMisc), "GetHitMargin", PatchType.Postfix, true)]
+    [JAPatch(typeof(scrMisc), "GetHitMargin", PatchType.Postfix, false)]
     public static void GetTiming(float hitangle, float refangle, bool isCW, float bpmTimesSpeed, float conductorPitch, HitMargin __result) {
         if(RDC.auto || scrController.instance.currFloor.nextfloor?.auto == true) return;
         float angle = (hitangle - refangle) * (isCW ? 1 : -1) * 57.29578f;
@@ -56,7 +56,8 @@ public class Timing : DoubleFeaturePatch {
         }
     }
 
-    [JAPatch(typeof(scrMistakesManager), "AddHit", PatchType.Postfix, true)]
+    [JAPatch(typeof(scrMistakesManager), "AddHit", PatchType.Postfix, false, MaxVersion = 140)]
+    [JAPatch(nameof(scrMarginTracker), nameof(scrMarginTracker.AddHit), PatchType.Postfix, false, MinVersion = 141)]
     public static void MissCheck(HitMargin hit) {
         if(hit != HitMargin.FailMiss) return;
         if(_lastTooEarly == null || _lastTooLate == null) return;
