@@ -37,7 +37,7 @@ public class FloatOffset : Feature {
 
     protected override void OnEnable() {
         foreach(CalibrationPreset preset in scrConductor.userPresets)
-            if(_settings.Offset.TryGetValue(preset.outputName, out float offset) && preset.inputOffset != (int) offset)
+            if(_settings.Offset.TryGetValue(preset.outputName, out float offset) && preset.inputOffset != Mathf.RoundToInt(offset))
                 _settings.Offset.Remove(preset.outputName);
     }
 
