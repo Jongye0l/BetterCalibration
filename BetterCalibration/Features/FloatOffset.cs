@@ -98,29 +98,67 @@ public class FloatOffset : Feature {
     private static IEnumerable<CodeInstruction> PostSong(IEnumerable<CodeInstruction> instructions) {
         using IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
         while(enumerator.MoveNext()) {
-            CodeInstruction current = enumerator.Current;
-            if(current.opcode == OpCodes.Call && current.operand is MethodInfo method) {
-                if(method == typeof(Math).Method("Round", typeof(double))) continue;
-                if(method == typeof(double).Method("ToString", [])) {
-                    yield return new CodeInstruction(OpCodes.Ldstr, "0.##");
-                    yield return new CodeInstruction(OpCodes.Call, typeof(double).Method("ToString", typeof(string)));
-                    continue;
-                }
-            } else if(current.opcode == OpCodes.Ldsflda && current.operand is FieldInfo field && field == typeof(scrConductor).Field("currentPreset")) {
+            CodeInstruction current = enumerator.Current!;
+            // ---- original code C# ----
+            // double num = Math.Round(averageTimeOffset * 1000.0);
+            // ---- replaced code C# ----
+            // double num = Math.Round(averageTimeOffset * 1000.0, 2);
+            // ---- original code IL ----
+            // IL_0107: ldarg.0      // this
+            // IL_0108: ldfld        float64 scrCalibrationPlanet::averageTimeOffset
+            // IL_010d: ldc.r8       1000
+            // IL_0116: mul
+            // IL_0117: call         float64 [mscorlib]System.Math::Round(float64)
+            // IL_011c: stloc.2      // V_2
+            // ---- replaced code IL ----
+            // ldarg.0      // this
+            // ldfld        float64 scrCalibrationPlanet::averageTimeOffset
+            // ldc.r8       1000
+            // mul
+            // ldc.i4.2
+            // call         float64 [mscorlib]System.Math::Round(float64, int32)
+            // stloc.2      // V_2
+            if(current.opcode == OpCodes.Call && current.operand is MethodInfo { Name: "Round" }) {
+                yield return new CodeInstruction(OpCodes.Ldc_I4_2);
+                yield return new CodeInstruction(OpCodes.Call, typeof(Math).Method("Round", typeof(double), typeof(int)));
+                continue;
+            }
+            if(current.opcode == OpCodes.Ldsflda && current.operand is FieldInfo { Name: "currentPreset" }) {
                 enumerator.MoveNext();
-                CodeInstruction next = enumerator.Current;
+                CodeInstruction next = enumerator.Current!;
                 if(next.opcode == OpCodes.Ldfld) {
                     yield return current;
                     yield return next;
                     continue;
                 }
+                // ---- original code C# ----
+                // scrConductor.currentPreset.inputOffset = Mathf.RoundToInt((float)(averageTimeOffset * 1000.0));
+                // ---- replaced code C# ----
+                // FloatOffset.Instance.Offset = (float)(averageTimeOffset * 1000.0);
+                // ---- original code IL ----
+                // IL_0395: ldsflda      valuetype CalibrationPreset scrConductor::currentPreset
+                // IL_039a: ldarg.0      // this
+                // IL_039b: ldfld        float64 scrCalibrationPlanet::averageTimeOffset
+                // IL_03a0: ldc.r8       1000
+                // IL_03a9: mul
+                // IL_03aa: conv.r4
+                // IL_03ab: call         int32 [UnityEngine.CoreModule]UnityEngine.Mathf::RoundToInt(float32)
+                // IL_03b0: stfld        int32 CalibrationPreset::inputOffset
+                // ---- replaced code IL ----
+                // ldsfld       class BetterCalibration.Features.FloatOffset BetterCalibration.Features.FloatOffset::Instance
+                // ldarg.0      // this
+                // ldfld        float64 scrCalibrationPlanet::averageTimeOffset
+                // ldc.r8       1000
+                // mul
+                // conv.r4
+                // call         instance void class BetterCalibration.Features.FloatOffset::set_Offset(float32)
                 yield return new CodeInstruction(OpCodes.Ldsfld, typeof(FloatOffset).Field("Instance"));
-                while(next.opcode != OpCodes.Call) {
+                while(next!.opcode != OpCodes.Call) {
                     yield return next;
                     enumerator.MoveNext();
                     next = enumerator.Current;
                 }
-                yield return new CodeInstruction(OpCodes.Callvirt, typeof(FloatOffset).Setter("Offset"));
+                yield return new CodeInstruction(OpCodes.Call, typeof(FloatOffset).Setter("Offset"));
                 enumerator.MoveNext();
                 enumerator.MoveNext();
                 continue;
@@ -133,14 +171,46 @@ public class FloatOffset : Feature {
     private static IEnumerable<CodeInstruction> PutDataPoint(IEnumerable<CodeInstruction> instructions) {
         using IEnumerator<CodeInstruction> enumerator = instructions.GetEnumerator();
         while(enumerator.MoveNext()) {
-            CodeInstruction current = enumerator.Current;
-            if(current.opcode == OpCodes.Call && current.operand is MethodInfo method) {
-                if(method == typeof(Math).Method("Round", typeof(double))) continue;
-                if(method == typeof(double).Method("ToString", [])) {
-                    yield return new CodeInstruction(OpCodes.Ldstr, "0.##");
-                    yield return new CodeInstruction(OpCodes.Call, typeof(double).Method("ToString", typeof(string)));
-                    continue;
-                }
+            CodeInstruction current = enumerator.Current!;
+            // ---- original code C# ----
+            // txtLastOffset.text = Math.Round(offset * 1000.0) + RDString.Get("editor.unit.ms");
+            // ---- replaced code C# ----
+            // txtLastOffset.text = Math.Round(offset * 1000.0, 2) + RDString.Get("editor.unit.ms");
+            // ---- original code IL ----
+            // IL_0053: ldarg.0      // this
+            // IL_0054: ldfld        class [UnityEngine.UI]UnityEngine.UI.Text scrCalibrationPlanet::txtLastOffset
+            // IL_0059: ldloc.0      // V_0
+            // IL_005a: ldc.r8       1000
+            // IL_0063: mul
+            // IL_0064: call         float64 [mscorlib]System.Math::Round(float64)
+            // IL_0069: stloc.3      // V_3
+            // IL_006a: ldloca.s     V_3
+            // IL_006c: call         instance string [mscorlib]System.Double::ToString()
+            // IL_0071: ldstr        "editor.unit.ms"
+            // IL_0076: ldnull
+            // IL_0077: ldc.i4.0
+            // IL_0078: call         string RDString::Get(string, class [mscorlib]System.Collections.Generic.Dictionary`2<string, object>, valuetype ['Assembly-CSharp-firstpass']SA.GoogleDoc.LangSection)
+            // IL_007d: call         string [mscorlib]System.String::Concat(string, string)
+            // ---- replaced code IL ----
+            // ldarg.0      // this
+            // ldfld        class [UnityEngine.UI]UnityEngine.UI.Text scrCalibrationPlanet::txtLastOffset
+            // ldloc.0      // V_0
+            // ldc.r8       1000
+            // mul
+            // ldc.i4.2
+            // call         float64 [mscorlib]System.Math::Round(float64, int32)
+            // stloc.3      // V_3
+            // ldloca.s     V_3
+            // call         instance string [mscorlib]System.Double::ToString()
+            // ldstr        "editor.unit.ms"
+            // ldnull
+            // ldc.i4.0
+            // call         string RDString::Get(string, class [mscorlib]System.Collections.Generic.Dictionary`2<string, object>, valuetype ['Assembly-CSharp-firstpass']SA.GoogleDoc.LangSection)
+            // call         string [mscorlib]System.String::Concat(string, string)
+            if(current.opcode == OpCodes.Call && current.operand is MethodInfo { Name: "Round" }) {
+                yield return new CodeInstruction(OpCodes.Ldc_I4_2);
+                yield return new CodeInstruction(OpCodes.Call, typeof(Math).Method("Round", typeof(double), typeof(int)));
+                continue;
             }
             yield return current;
         }
