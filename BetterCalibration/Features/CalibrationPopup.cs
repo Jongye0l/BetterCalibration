@@ -5,6 +5,7 @@ using JALib.Core;
 using JALib.Core.Patch;
 using MonsterLove.StateMachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
@@ -15,18 +16,26 @@ public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup
     private static Text _popupText;
     private static float _changeOffset;
 
-    protected override void OnEnable() => Timing.Instance.AddPatch(this);
+    protected override void OnEnable() {
+        Timing.Instance.AddPatch(this);
+        SceneManager.sceneUnloaded += OnSceneUnloaded;
+    }
 
     protected override void OnDisable() {
         Timing.Instance.RemovePatch(this);
+        SceneManager.sceneUnloaded -= OnSceneUnloaded;
         Hide();
         _popupText = null;
         _gameObject = null;
     }
+    
+    private static void OnSceneUnloaded(Scene _) {
+        Hide();
+    }
 
     [JAPatch(typeof(StateBehaviour), "ChangeState", PatchType.Postfix, true, ArgumentTypesType = [typeof(Enum)])]
     public static void OnChangeState(Enum newState) {
-        if((States) newState == States.Fail2) Show();
+        if((States) newState == States.Fail2 && ADOBase.controller is { paused: false } && ADOBase.conductor is { isGameWorld: true }) Show();
         else Hide();
     }
 
