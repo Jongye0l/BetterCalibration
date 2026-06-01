@@ -146,6 +146,7 @@ public class CalibrationPopup : Feature {
     private static void Hide() {
         if(!_gameObject) return;
         Object.DestroyImmediate(_gameObject);
-        Cursor.visible = !Persistence.GetHideCursorWhilePlaying();
+        if(ADOBase.controller is { paused: false } && ADOBase.conductor is { isGameWorld: true }) 
+            Cursor.visible = !Persistence.GetHideCursorWhilePlaying();
     }
 }
