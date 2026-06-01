@@ -11,7 +11,7 @@ public class Timing : MultiFeature {
     private static float _lastTooLate;
     public static List<float> Timings;
 
-    public Timing(JAMod mod) : base(mod) {
+    public Timing() : base(Main.Instance) {
         Patcher.AddPatch(typeof(Timing));
     }
 
