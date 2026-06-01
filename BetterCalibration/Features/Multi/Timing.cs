@@ -7,13 +7,11 @@ using MonsterLove.StateMachine;
 namespace BetterCalibration.Features.Multi;
 
 public class Timing : MultiFeature {
-    public static Timing Instance;
-    private static float? _lastTooEarly;
-    private static float? _lastTooLate;
+    private static float _lastTooEarly;
+    private static float _lastTooLate;
     public static List<float> Timings;
 
     public Timing(JAMod mod) : base(mod) {
-        Instance = this;
         Patcher.AddPatch(typeof(Timing));
     }
 
@@ -22,22 +20,21 @@ public class Timing : MultiFeature {
     }
 
     protected override void OnDisable() {
-        _lastTooEarly = null;
-        _lastTooLate = null;
+        ResetLastTooJudge();
         Timings.Clear();
         Timings = null;
     }
 
     [JAPatch(typeof(StateBehaviour), "ChangeState", PatchType.Postfix, true, ArgumentTypesType = [typeof(Enum)])]
     public static void OnChangeState(Enum newState) {
-        if((States) newState != States.Fail2) ExitPlay();
+        if((States) newState != States.Fail2) ResetLastTooJudge();
         if((States) newState == States.Start) Timings.Clear();
     }
 
     [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, false)]
-    public static void ExitPlay() {
-        _lastTooEarly = null;
-        _lastTooLate = null;
+    public static void ResetLastTooJudge() {
+        _lastTooEarly = float.NaN;
+        _lastTooLate = float.NaN;
     }
 
     [JAPatch(typeof(scrMisc), "GetHitMargin", PatchType.Postfix, false)]
@@ -54,8 +51,7 @@ public class Timing : MultiFeature {
                 break;
             default:
                 Timings.Add(timing);
-                _lastTooEarly = null;
-                _lastTooLate = null;
+                ResetLastTooJudge();
                 break;
         }
     }
@@ -64,10 +60,9 @@ public class Timing : MultiFeature {
     [JAPatch(nameof(scrMarginTracker), nameof(scrMarginTracker.AddHit), PatchType.Postfix, false, MinVersion = 141)]
     public static void MissCheck(HitMargin hit) {
         if(hit != HitMargin.FailMiss) return;
-        if(_lastTooEarly == null || _lastTooLate == null) return;
+        if(float.IsNaN(_lastTooEarly) || float.IsNaN(_lastTooLate)) return;
         Timings.Add((float) _lastTooLate);
         Timings.Add((float) _lastTooEarly);
-        _lastTooLate = null;
-        _lastTooEarly = null;
+        ResetLastTooJudge();
     }
 }
