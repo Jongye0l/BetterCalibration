@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using ADOFAI;
-using BetterCalibration.DoubleFeaturePatch;
+using BetterCalibration.Features.Multi;
 using HarmonyLib;
 using JALib.Core;
 using JALib.Core.Patch;
@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace BetterCalibration.Features;
 
-public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true, typeof(TimingLogger), typeof(TimingLoggerSettings)) {
+public class TimingLogger : Feature {
     private static bool _logging;
     private static Dictionary<Hash, List<float>> _timings;
     private static long _lastUseTime;
@@ -28,12 +28,8 @@ public class TimingLogger() : Feature(Main.Instance, nameof(TimingLogger), true,
     private string _maxTimingsPerMap;
     private static readonly Hash AllHash = new([]);
 
-    protected override void OnEnable() {
-        Timing.Instance.AddPatch(this);
-    }
-
-    protected override void OnDisable() {
-        Timing.Instance.RemovePatch(this);
+    public TimingLogger() : base(Main.Instance, nameof(TimingLogger), true, typeof(TimingLogger), typeof(TimingLoggerSettings)) {
+        AddMultiFeatures(typeof(Timing));
     }
 
     protected override void OnGUI() {
@@ -299,7 +295,7 @@ WorkEnd:
         fileStream.WriteObject(GetTiming(AllHash));
         fileStream.WriteInt(_timings.Count - 1);
         foreach(KeyValuePair<Hash, List<float>> valuePair in _timings.Where(valuePair => valuePair.Key != AllHash)) {
-            fileStream.Write(valuePair.Key.data);
+            fileStream.Write(valuePair.Key.Data);
             fileStream.WriteObject(valuePair.Value);
         }
     }
@@ -314,22 +310,22 @@ WorkEnd:
     }
 
     public readonly struct Hash(byte[] data) : IEquatable<Hash> {
-        public readonly byte[] data = data;
+        public readonly byte[] Data = data;
 
         public override bool Equals(object obj) => obj is Hash hash ? Equals(hash) : obj is byte[] bytes && Equals(bytes);
-        public bool Equals(Hash other) => Equals(other.data);
+        public bool Equals(Hash other) => Equals(other.Data);
         public bool Equals(byte[] hash) {
-            if(data.Length != hash.Length) return false;
-            return data.Length == hash.Length && !data.Where((t, i) => t != hash[i]).Any();
+            if(Data.Length != hash.Length) return false;
+            return Data.Length == hash.Length && !Data.Where((t, i) => t != hash[i]).Any();
         }
-        public override int GetHashCode() => data != null ? ToString().GetHashCode() : 0;
+        public override int GetHashCode() => Data != null ? ToString().GetHashCode() : 0;
 
         public static bool operator ==(Hash left, Hash right) => left.Equals(right);
         public static bool operator !=(Hash left, Hash right) => !(left == right);
 
         public static implicit operator Hash(byte[] hash) => new(hash);
-        public static implicit operator byte[](Hash hash) => hash.data;
+        public static implicit operator byte[](Hash hash) => hash.Data;
 
-        public override string ToString() => data.Join(b => b.ToString("x2"), "");
+        public override string ToString() => Data.Join(b => b.ToString("x2"), "");
     }
 }

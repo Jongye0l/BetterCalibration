@@ -5,7 +5,6 @@ using JALib.Core.Patch;
 using JALib.Tools;
 using SA.GoogleDoc;
 using UnityEngine;
-using UnityModManagerNet;
 
 namespace BetterCalibration;
 

@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using JALib.Core;
 using JALib.Core.Patch;
 using MonsterLove.StateMachine;
 
-namespace BetterCalibration.DoubleFeaturePatch;
+namespace BetterCalibration.Features.Multi;
 
-public class Timing : DoubleFeaturePatch {
-    private static Timing _instance;
+public class Timing : MultiFeature {
+    public static Timing Instance;
     private static float? _lastTooEarly;
     private static float? _lastTooLate;
     public static List<float> Timings;
 
-    public static Timing Instance => _instance ??= new Timing();
+    public Timing(JAMod mod) : base(mod) {
+        Instance = this;
+        Patcher.AddPatch(typeof(Timing));
+    }
 
-    public override void OnEnable() {
+    protected override void OnEnable() {
         Timings = [];
     }
 
-    public override void OnDisable() {
+    protected override void OnDisable() {
         _lastTooEarly = null;
         _lastTooLate = null;
         Timings.Clear();

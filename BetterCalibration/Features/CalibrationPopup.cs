@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using BetterCalibration.DoubleFeaturePatch;
+using BetterCalibration.Features.Multi;
 using JALib.Core;
 using JALib.Core.Patch;
 using MonsterLove.StateMachine;
@@ -11,18 +11,20 @@ using Object = UnityEngine.Object;
 
 namespace BetterCalibration.Features;
 
-public class CalibrationPopup() : Feature(Main.Instance, nameof(CalibrationPopup), true, typeof(CalibrationPopup)) {
+public class CalibrationPopup : Feature {
     private static GameObject _gameObject;
     private static Text _popupText;
     private static float _changeOffset;
 
+    public CalibrationPopup() : base(Main.Instance, nameof(CalibrationPopup), true, typeof(CalibrationPopup)) {
+        AddMultiFeatures(typeof(Timing));
+    }
+
     protected override void OnEnable() {
-        Timing.Instance.AddPatch(this);
         SceneManager.sceneUnloaded += OnSceneUnloaded;
     }
 
     protected override void OnDisable() {
-        Timing.Instance.RemovePatch(this);
         SceneManager.sceneUnloaded -= OnSceneUnloaded;
         Hide();
         _popupText = null;
