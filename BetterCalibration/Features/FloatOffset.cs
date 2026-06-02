@@ -24,6 +24,7 @@ public class FloatOffset : Feature {
             if(scrConductor.currentPreset.inputOffset != cur) {
                 scrConductor.currentPreset.inputOffset = cur;
                 scrConductor.SaveCurrentPreset();
+                Persistence.WriteSaveToDisk();
             }
             if(_settings.Offset.TryGetValue(scrConductor.currentPreset.outputName, out float f) && f == value) return;
             _settings.Offset[scrConductor.currentPreset.outputName] = value;
