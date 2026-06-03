@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JALib.Core;
@@ -62,7 +63,7 @@ public class CalibrationDetail() : Feature(Main.Instance, nameof(CalibrationDeta
     }
 
     private static string ToStringAuto(float f) {
-        return FloatOffset.Instance.Enabled ? f.ToString("0.##") : Mathf.RoundToInt(f).ToString();
+        return FloatOffset.Instance.Enabled ? Math.Round(f, 2).ToString("0.##") : Mathf.RoundToInt(f).ToString();
     }
 
     private static float GetTimingAverage() => VersionControl.releaseNumber < 141 ? GetTimingAverageR136() : GetTimingAverageR141();
