@@ -1,43 +1,95 @@
-﻿using System.Reflection;
-using BetterCalibration.GUI;
-using HarmonyLib;
+﻿using System;
+using BetterCalibration.Features;
+using JALib.Core;
+using JALib.Core.Patch;
+using JALib.Tools;
+using SA.GoogleDoc;
 using UnityEngine;
-using UnityModManagerNet;
 
-namespace BetterCalibration {
-    public class Main {
-        public static UnityModManager.ModEntry.ModLogger Logger;
-        public static UnityModManager.ModEntry ModEntry;
-        private static Harmony _harmony;
-        public static bool Enabled;
-        public static Settings Settings;
-        private static Assembly _assembly;
+namespace BetterCalibration;
 
-        public static void Setup(UnityModManager.ModEntry modEntry) {
-            ModEntry = modEntry;
-            Logger = modEntry.Logger;
-            modEntry.OnToggle = OnToggle;
-            modEntry.OnGUI = SettingGUI.OnGUI;
-            _assembly = Assembly.GetExecutingAssembly();
-            Settings = Settings.CreateInstance();
-        }
+public class Main : JAMod {
+    public static Main Instance;
+    public static SettingGUI SettingGUI;
+    public static string OffsetString;
 
-        private static bool OnToggle(UnityModManager.ModEntry modEntry, bool value) {
-            Enabled = value;
-            if(value) {
-                _harmony = new Harmony(modEntry.Info.Id);
-                _harmony.PatchAll(_assembly);
-            } else {
-                _harmony.UnpatchAll(modEntry.Info.Id);
-            }
-            return true;
-        }
-
-        public static Values GetValues() {
-            return Settings.Values ??
-                   (RDString.language == SystemLanguage.Korean ? Values.Korean :
-                       RDString.language == SystemLanguage.Japanese ? Values.Japanese : 
-                       RDString.language == SystemLanguage.Vietnamese ? Values.Vietnamese : Values.English);
-        }
+    protected override void OnSetup() {
+        SettingGUI = new SettingGUI(this);
+        AddFeature(new CalibrationPopup(), new CalibrationDetail(), new CalibrationSong(), new TimingLogger(), new FloatOffset());
+        Patcher.AddPatch(ShowSettingsMenu);
     }
+
+    protected override void OnEnable() {
+    }
+
+    protected override void OnDisable() {
+    }
+
+    protected override void OnGUI() {
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(Localization["Language"]);
+        GUILayout.Space(4f);
+        AddLanguageButton(Localization["Language.Default"], null);
+        AddLanguageButton("한국어", SystemLanguage.Korean);
+        AddLanguageButton("English", SystemLanguage.English);
+        AddLanguageButton("日本語", SystemLanguage.Japanese);
+        AddLanguageButton("Tiếng Việt", SystemLanguage.Vietnamese);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+    }
+
+    protected override void OnGUIBehind() {
+        if(FloatOffset.Instance.Enabled) return;
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(Localization["InputOffset"]);
+        GUILayout.Space(4f);
+        if(GUILayout.Button("-", GUILayout.Width(25))) {
+            scrConductor.currentPreset.inputOffset--;
+            scrConductor.SaveCurrentPreset();
+        }
+        int offset = scrConductor.currentPreset.inputOffset;
+        if(OffsetString.IsNullOrEmpty() || !int.TryParse(OffsetString, out int i) || i != offset) OffsetString = offset.ToString();
+        OffsetString = GUILayout.TextField(OffsetString);
+        int resultInt;
+        try {
+            resultInt = OffsetString.IsNullOrEmpty() ? offset : int.TryParse(OffsetString, out i) ? i : offset;
+        } catch (FormatException) {
+            resultInt = offset;
+        }
+        if(resultInt != offset) {
+            scrConductor.currentPreset.inputOffset = resultInt;
+            scrConductor.SaveCurrentPreset();
+        }
+        GUILayout.Label("ms");
+        if(GUILayout.Button("+", GUILayout.Width(25))) {
+            scrConductor.currentPreset.inputOffset++;
+            scrConductor.SaveCurrentPreset();
+        }
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+    }
+
+    protected override void OnHideGUI() => OffsetString = null;
+
+    private void AddLanguageButton(string text, SystemLanguage? lang) {
+        if(!GUILayout.Button(GetSelectText(text, CustomLanguage == lang))) return;
+        CustomLanguage = lang;
+    }
+
+    private static string GetSelectText(string text, bool selected) {
+        return selected ? $"<b>{text}</b>" : text;
+    }
+
+    [JAPatch(typeof(SettingsMenu), nameof(SettingsMenu.Show), PatchType.Prefix, true)]
+    private static void ShowSettingsMenu(PauseSettingButton ___offsetButton) {
+        if(!___offsetButton) return;
+        if(FloatOffset.Instance.Enabled) FloatOffset.Instance.SetOffsetSettingString(___offsetButton);
+        else ___offsetButton.valueLabel.text = scrConductor.currentPreset.inputOffset + RdStringGet("editor.unit." + ___offsetButton.unit);
+    }
+
+    public static string RdStringGet(string key) {
+        return VersionControl.releaseNumber < 141 ? typeof(RDString).Invoke<string>("Get", key, null, LangSection.Translations) : RdStringGetR141(key);
+    }
+
+    private static string RdStringGetR141(string key) => RDString.Get(key);
 }
