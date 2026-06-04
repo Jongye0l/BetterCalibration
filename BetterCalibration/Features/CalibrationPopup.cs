@@ -143,11 +143,11 @@ public class CalibrationPopup : Feature {
         Cursor.visible = true;
     }
 
-    [JAPatch(typeof(scrController), "TogglePauseGame", PatchType.Postfix, true)]
+    [JAPatch(typeof(scrController), nameof(scrController.TogglePauseGame), PatchType.Postfix, true)]
     private static void Hide() {
         if(!_gameObject) return;
         Object.DestroyImmediate(_gameObject);
-        if(ADOBase.controller is { paused: false } && ADOBase.conductor is { isGameWorld: true }) 
+        if((ADOBase.isLevelEditor || ADOBase.controller is { paused: false }) && ADOBase.conductor is { isGameWorld: true }) 
             Cursor.visible = !Persistence.GetHideCursorWhilePlaying();
     }
 }
