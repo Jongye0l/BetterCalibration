@@ -129,6 +129,7 @@ public class CalibrationPopup : Feature {
         else {
             scrConductor.currentPreset.inputOffset = Mathf.RoundToInt(_changeOffset);
             scrConductor.SaveCurrentPreset();
+            Persistence.WriteSaveToDisk();
         }
         Hide();
     }

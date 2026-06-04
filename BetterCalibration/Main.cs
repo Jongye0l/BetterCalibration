@@ -46,6 +46,7 @@ public class Main : JAMod {
         if(GUILayout.Button("-", GUILayout.Width(25))) {
             scrConductor.currentPreset.inputOffset--;
             scrConductor.SaveCurrentPreset();
+            Persistence.WriteSaveToDisk();
         }
         int offset = scrConductor.currentPreset.inputOffset;
         if(OffsetString.IsNullOrEmpty() || !int.TryParse(OffsetString, out int i) || i != offset) OffsetString = offset.ToString();
@@ -59,11 +60,13 @@ public class Main : JAMod {
         if(resultInt != offset) {
             scrConductor.currentPreset.inputOffset = resultInt;
             scrConductor.SaveCurrentPreset();
+            Persistence.WriteSaveToDisk();
         }
         GUILayout.Label("ms");
         if(GUILayout.Button("+", GUILayout.Width(25))) {
             scrConductor.currentPreset.inputOffset++;
             scrConductor.SaveCurrentPreset();
+            Persistence.WriteSaveToDisk();
         }
         GUILayout.FlexibleSpace();
         GUILayout.EndHorizontal();

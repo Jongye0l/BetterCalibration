@@ -55,6 +55,7 @@ public class TimingLogger : Feature {
                 if(scrConductor.currentPreset.inputOffset != (int) mapTimings[0]) {
                     scrConductor.currentPreset.inputOffset = (int) mapTimings[0];
                     scrConductor.SaveCurrentPreset();
+                    Persistence.WriteSaveToDisk();
                 }
             }
             GUILayout.FlexibleSpace();
@@ -91,6 +92,7 @@ public class TimingLogger : Feature {
                                     if(scrConductor.currentPreset.inputOffset == roundedTiming) continue;
                                     scrConductor.currentPreset.inputOffset = roundedTiming;
                                     scrConductor.SaveCurrentPreset();
+                                    Persistence.WriteSaveToDisk();
                                 }
                             GUILayout.EndVertical();
                         GUILayout.EndHorizontal();
@@ -134,6 +136,7 @@ public class TimingLogger : Feature {
                                     if(scrConductor.currentPreset.inputOffset == roundedTiming) continue;
                                     scrConductor.currentPreset.inputOffset = roundedTiming;
                                     scrConductor.SaveCurrentPreset();
+                                    Persistence.WriteSaveToDisk();
                                 }
                             GUILayout.EndVertical();
                         GUILayout.EndHorizontal();
