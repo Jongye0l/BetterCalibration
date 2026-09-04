@@ -160,7 +160,7 @@ public class TimingLogger : Feature {
     public static void LogTiming() {
         if(_logging || Timing.Timings.Count == 0) return;
         Hash mapHash = GetMapHash();
-        float timing = scrConductor.currentPreset.inputOffset + Timing.Timings.Average();
+        float timing = scrConductor.currentPreset.inputOffset + Timing.GetTrimmedMeanTiming();
         AddTiming(mapHash, timing, _settings.MaxTimingsPerMap);
         AddTiming(AllHash, timing, _settings.MaxTimings);
         _logging = true;

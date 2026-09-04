@@ -109,7 +109,7 @@ public class CalibrationPopup : Feature {
     private static void SetupText() {
         string original;
         string changed;
-        _changeOffset = GetTimingAverage();
+        _changeOffset = Timing.GetTrimmedMeanTiming();
         if(FloatOffset.Instance.Enabled) {
             float f = FloatOffset.Instance.Offset;
             _changeOffset += f;
@@ -133,8 +133,6 @@ public class CalibrationPopup : Feature {
         }
         Hide();
     }
-
-    private static float GetTimingAverage() => Timing.Timings.Count == 0 ? 0f : Timing.Timings.Average();
 
     private static void Show() {
         if(!_gameObject) Initialize();

@@ -179,4 +179,13 @@ public class Timing : MultiFeature {
         Timings.Add(_lastTooEarly);
         ResetLastTooJudge();
     }
+
+    public static float GetTrimmedMeanTiming() {
+        if(Timings.Count == 0) return 0;
+
+        int trimCount = (int) Math.Floor(Timings.Count * 0.1);
+        if(trimCount == 0) return Timings.Average();
+
+        return Timings.OrderBy(t => t).Skip(trimCount).Take(Timings.Count - 2 * trimCount).Average();
+    }
 }
