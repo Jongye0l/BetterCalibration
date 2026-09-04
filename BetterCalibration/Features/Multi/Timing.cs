@@ -15,24 +15,9 @@ public class Timing : MultiFeature {
     private static float _lastTooEarly;
     private static float _lastTooLate;
     public static List<float> Timings;
-    private static Func<float, float, bool, float, float, double, HitMargin> _getHitMarginR141;
 
     public Timing() : base(Main.Instance) {
         Patcher.AddPatch(typeof(Timing));
-        if(VersionControl.releaseNumber >= 149) {
-            int founded = 0;
-            foreach(MethodInfo methodInfo in typeof(scrPlanet).Methods()) {
-                if(methodInfo.Name.StartsWith("<SwitchChosen>") && methodInfo.Name.Contains("GetHitMargin")) {
-                    Patcher.AddPatch(GetHitMargin, new JAPatchAttribute(methodInfo, PatchType.Transpiler, false));
-                    founded++;
-                }
-            }
-
-            if(founded < 1) Main.Instance.Error("Failed to find the method for transpiler patching: scrPlanet.<SwitchChosen>g__GetHitMargin|");
-            else if(founded != 1) Main.Instance.Warning($"Found {founded} methods for transpiler patching: scrPlanet.<SwitchChosen>g__GetHitMargin|. Expected 1.");
-        } else if(VersionControl.releaseNumber >= 141) {
-            _getHitMarginR141 = (Func<float, float, bool, float, float, double, HitMargin>) Delegate.CreateDelegate(typeof(Func<float, float, bool, float, float, double, HitMargin>), typeof(scrMisc).Method("GetHitMargin"));
-        }
     }
 
     protected override void OnEnable() {
@@ -91,79 +76,39 @@ public class Timing : MultiFeature {
         float timing = angle / 180 / bpmTimesSpeed / conductorPitch * 60000;
         SetTiming(timing, __result);
     }
+    
+    private static scrPlanet _planet;
+    
+    [JAPatch(typeof(scrPlanet), nameof(scrPlanet.SwitchChosen), PatchType.Prefix, true, MinVersion = 141, TryingCatch = false)]
+    private static void SwitchChosenPrefix(scrPlanet __instance) => _planet = __instance;
 
-    [JAPatch(typeof(scrPlanet), nameof(scrPlanet.SwitchChosen), PatchType.Transpiler, false, MinVersion = 141, MaxVersion = 148)]
-    private static IEnumerable<CodeInstruction> GetHitMarginR141(IEnumerable<CodeInstruction> instructions) {
-        List<CodeInstruction> list = instructions.ToList();
-        for(int i = 0; i < list.Count; i++) {
-            CodeInstruction codeInstruction = list[i];
-            if(codeInstruction.operand is not MethodInfo { Name: "GetHitMargin" }) continue;
-            list[i] = new CodeInstruction(OpCodes.Ldarg_0);
-            list.Insert(++i, new CodeInstruction(OpCodes.Call, ((Delegate) GetHitMarginProxy).Method));
-        }
-        return list;
+    [JAPatch(typeof(scrPlanet), nameof(scrPlanet.SwitchChosen), PatchType.Finalizer, false, MinVersion = 141, TryingCatch = false)]
+    private static void SwitchChosenFinalizer() => _planet = null;
+
+    [JAPatch(typeof(scrMisc), "GetHitMargin", PatchType.Postfix, false, MinVersion = 141, MaxVersion = 148)]
+    public static void OnHitMarginChangeR141(float hitangle, float refangle, bool isCW, float bpmTimesSpeed, float conductorPitch, HitMargin __result) {
+        if(!IsTimingAvailable(_planet)) return;
+
+        float angle = (hitangle - refangle) * (isCW ? 1 : -1) * 57.29578f;
+        float timing = angle / 180 / bpmTimesSpeed / conductorPitch * 60000;
+        SetTiming(timing, __result);
     }
 
-    public static HitMargin GetHitMarginProxy(float hitangle, float refangle, bool isCW, float bpmTimesSpeed, float conductorPitch, double marginScale, scrPlanet planet) {
-        HitMargin result = _getHitMarginR141(hitangle, refangle, isCW, bpmTimesSpeed, conductorPitch, marginScale);
-        try {
-            if(IsTimingAvailable(planet)) {
-                float angle = (hitangle - refangle) * (isCW ? 1 : -1) * 57.29578f;
-                float timing = angle / 180 / bpmTimesSpeed / conductorPitch * 60000;
-                SetTiming(timing, result);
-            }
-        } catch (Exception e) {
-            Main.Instance.LogReportException("Failed to calculate timing", e);
-        }
-        return result;
+    [JAPatch(typeof(scrMisc), nameof(scrMisc.GetHitMarginInDeg), PatchType.Postfix, false, MinVersion = 149)]
+    private static void GetHitMarginInDegProxyR149(float hitAngle, float refAngle, bool clockwise, float floorBpm, float conductorPitch, HitMargin __result) {
+        if(!IsTimingAvailable(_planet)) return;
+
+        float angle = (hitAngle - refAngle) * (clockwise ? 1 : -1) * 57.29578f;
+        float timing = angle / 180 / floorBpm / conductorPitch * 60000;
+        SetTimingR149(timing, __result);
     }
 
-    private static IEnumerable<CodeInstruction> GetHitMargin(IEnumerable<CodeInstruction> instructions) {
-        List<CodeInstruction> list = instructions.ToList();
-        for(int i = 0; i < list.Count; i++) {
-            CodeInstruction codeInstruction = list[i];
-            if(codeInstruction.operand is not MethodInfo methodInfo) continue;
-            switch(methodInfo.Name) {
-                case "GetHitMarginInDeg":
-                    list[i] = new CodeInstruction(OpCodes.Ldarg_0);
-                    list.Insert(++i, new CodeInstruction(OpCodes.Call, ((Delegate) GetHitMarginInDegProxyR149).Method));
-                    break;
-                case "GetHitMarginInSec":
-                    list[i] = new CodeInstruction(OpCodes.Ldarg_0);
-                    list.Insert(++i, new CodeInstruction(OpCodes.Call, ((Delegate) GetHitMarginInSecProxyR149).Method));
-                    break;
-            }
-        }
-        return list;
-    }
+    [JAPatch(typeof(scrMisc), nameof(scrMisc.GetHitMarginInSec), PatchType.Postfix, false, MinVersion = 149)]
+    private static void GetHitMarginInSecProxyR149(double timeDiff, HitMargin __result) {
+        if(!IsTimingAvailable(_planet)) return;
 
-    private static HitMargin GetHitMarginInDegProxyR149(Difficulty difficulty, float hitAngle, float refAngle, bool clockwise,
-                                                        float floorBpm, float conductorPitch, double marginScale, scrPlanet planet) {
-        HitMargin result = scrMisc.GetHitMarginInDeg(difficulty, hitAngle, refAngle, clockwise, floorBpm, conductorPitch, marginScale);
-        try {
-            if(IsTimingAvailable(planet)) {
-                float angle = (hitAngle - refAngle) * (clockwise ? 1 : -1) * 57.29578f;
-                float timing = angle / 180 / floorBpm / conductorPitch * 60000;
-                SetTimingR149(timing, result);
-            }
-        } catch (Exception e) {
-            Main.Instance.LogReportException("Failed to calculate hit margin in degrees", e);
-        }
-        return result;
-    }
-
-    private static HitMargin GetHitMarginInSecProxyR149(Difficulty difficulty, double timeDiff, float floorBpm,
-                                                        float conductorPitch, double marginScale, scrPlanet planet) {
-        HitMargin result = scrMisc.GetHitMarginInSec(difficulty, timeDiff, floorBpm, conductorPitch, marginScale);
-        try {
-            if(IsTimingAvailable(planet)) {
-                float timing = (float) timeDiff * 1000;
-                SetTimingR149(timing, result);
-            }
-        } catch (Exception e) {
-            Main.Instance.LogReportException("Failed to calculate hit margin in seconds", e);
-        }
-        return result;
+        float timing = (float) timeDiff * 1000;
+        SetTimingR149(timing, __result);
     }
 
     private static bool IsTimingAvailable(scrPlanet planet) => !RDC.auto && !planet.player.auto && (!planet.currfloor.nextfloor || !planet.currfloor.nextfloor.auto);
