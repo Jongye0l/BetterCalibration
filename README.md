@@ -34,15 +34,17 @@
 * JALib 모드를 받은 후 [이 링크](https://github.com/Jongye0l/BetterCalibration/releases/latest) 에서 다운로드 하여 모드매니저를 통해 적용시키면 됩니다.
 ---
 ### 개발 환경 Development environment
-* Windows 11
-* Rider 2026.1.2
+* Linux 7.1.8-arch1-3
+* Rider 2026.2.1
 * .NET Framework 4.8.1
-* C# 13
-* A Dance of Fire and Ice 3.1.1(r142, 65c2589)
+* C# 14
+* A Dance of Fire and Ice 3.3.2(r149, 4f5d053)
 ---
 ### 테스트 환경 Test environment
-* Windows 11
-* A Dance of Fire and Ice 2.9.8(r136, 41f0b77)
-* A Dance of Fire and Ice 3.1.1(r142, 65c2589)
+* Linux 7.1.8-arch1-3
+* A Dance of Fire and Ice 2.9.8(r136, 87412bd)
+* A Dance of Fire and Ice 3.2.0(r145, 2aa2745)
+* A Dance of Fire and Ice 3.3.1(r148, 1b7d115)
+* A Dance of Fire and Ice 3.3.2(r149, 4f5d053)
 ---
 # [Join My Discord!](https://discord.jongyeol.kr)
